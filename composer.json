@@ -1,88 +1,90 @@
 {
-    "name": "fiberflow/fiberflow",
-    "description": "Revolutionary Laravel queue worker using PHP Fibers for cooperative multitasking and 10x throughput",
-    "keywords": [
-        "laravel",
-        "queue",
-        "fiber",
-        "async",
-        "concurrent",
-        "performance",
-        "revolt",
-        "amphp"
-    ],
-    "homepage": "https://github.com/fiberflow/fiberflow",
-    "license": "MIT",
-    "type": "library",
-    "authors": [
-        {
-            "name": "FiberFlow Contributors",
-            "email": "hello@fiberflow.dev",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": "^8.2",
-        "illuminate/contracts": "^11.0|^12.0",
-        "illuminate/queue": "^11.0|^12.0",
-        "illuminate/support": "^11.0|^12.0",
-        "illuminate/console": "^11.0|^12.0",
-        "revolt/event-loop": "^1.0",
-        "amphp/amp": "^3.0",
-        "amphp/http-client": "^5.0"
-    },
-    "require-dev": {
-        "orchestra/testbench": "^9.0|^10.0",
-        "pestphp/pest": "^2.0|^3.0",
-        "pestphp/pest-plugin-laravel": "^2.0|^3.0",
-        "phpstan/phpstan": "^1.10",
-        "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^8.0",
-        "phpunit/phpunit": "^10.0|^11.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "FiberFlow\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "FiberFlow\\Tests\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": "vendor/bin/pest",
-        "test:coverage": "vendor/bin/pest --coverage",
-        "test:unit": "vendor/bin/pest --testsuite=Unit",
-        "test:feature": "vendor/bin/pest --testsuite=Feature",
-        "lint": "vendor/bin/pint --test",
-        "format": "vendor/bin/pint",
-        "analyse": "vendor/bin/phpstan analyse",
-        "check": [
-            "@lint",
-            "@analyse",
-            "@test"
-        ]
-    },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true,
-            "php-http/discovery": true
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "FiberFlow\\FiberFlowServiceProvider"
-            ],
-            "aliases": {
-                "AsyncHttp": "FiberFlow\\Facades\\AsyncHttp",
-                "AsyncDb": "FiberFlow\\Facades\\AsyncDb"
-            }
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "fiberflow/fiberflow",
+  "description": "Revolutionary Laravel queue worker using PHP Fibers for cooperative multitasking and 10x throughput",
+  "keywords": [
+    "laravel",
+    "queue",
+    "fiber",
+    "async",
+    "concurrent",
+    "performance",
+    "revolt",
+    "amphp"
+  ],
+  "homepage": "https://github.com/virgilhawkins00/fiberflow",
+  "license": "MIT",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Virgil Hawkins",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/virgilhawkins00/fiberflow/issues",
+    "source": "https://github.com/virgilhawkins00/fiberflow"
+  },
+  "require": {
+    "php": "^8.2",
+    "illuminate/contracts": "^11.0|^12.0",
+    "illuminate/queue": "^11.0|^12.0",
+    "illuminate/support": "^11.0|^12.0",
+    "illuminate/console": "^11.0|^12.0",
+    "revolt/event-loop": "^1.0",
+    "amphp/amp": "^3.0",
+    "amphp/http-client": "^5.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^9.0|^10.0",
+    "pestphp/pest": "^2.0|^3.0",
+    "pestphp/pest-plugin-laravel": "^2.0|^3.0",
+    "phpstan/phpstan": "^1.10",
+    "laravel/pint": "^1.0",
+    "nunomaduro/collision": "^8.0",
+    "phpunit/phpunit": "^10.0|^11.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "FiberFlow\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "FiberFlow\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest",
+    "test:coverage": "vendor/bin/pest --coverage",
+    "test:unit": "vendor/bin/pest --testsuite=Unit",
+    "test:feature": "vendor/bin/pest --testsuite=Feature",
+    "lint": "vendor/bin/pint --test",
+    "format": "vendor/bin/pint",
+    "analyse": "vendor/bin/phpstan analyse",
+    "check": [
+      "@lint",
+      "@analyse",
+      "@test"
+    ]
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true,
+      "php-http/discovery": true
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "FiberFlow\\FiberFlowServiceProvider"
+      ],
+      "aliases": {
+        "AsyncHttp": "FiberFlow\\Facades\\AsyncHttp",
+        "AsyncDb": "FiberFlow\\Facades\\AsyncDb"
+      }
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }
-
