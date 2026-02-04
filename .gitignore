@@ -31,7 +31,5 @@ Thumbs.db
 # Project specific
 FiberFlow.md
 composer.lock
-
-# Documentation (keep in repo but ignore local changes)
-# docs/ROADMAP.md
-# docs/ARCHITECTURE.md
+docs/ROADMAP.md
+docs/ARCHITECTURE.md
