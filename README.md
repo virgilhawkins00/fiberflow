@@ -1,9 +1,10 @@
 # FiberFlow
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/fiberflow/fiberflow.svg?style=flat-square)](https://packagist.org/packages/fiberflow/fiberflow)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/fiberflow/fiberflow/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/fiberflow/fiberflow/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/fiberflow/fiberflow.svg?style=flat-square)](https://packagist.org/packages/fiberflow/fiberflow)
-[![License](https://img.shields.io/packagist/l/fiberflow/fiberflow.svg?style=flat-square)](https://packagist.org/packages/fiberflow/fiberflow)
+[![Latest Release](https://img.shields.io/github/v/release/virgilhawkins00/fiberflow?style=flat-square)](https://github.com/virgilhawkins00/fiberflow/releases)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/virgilhawkins00/fiberflow/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/virgilhawkins00/fiberflow/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D8.2-8892BF?style=flat-square)](https://www.php.net/)
+[![Laravel Version](https://img.shields.io/badge/laravel-11.x%20%7C%2012.x-FF2D20?style=flat-square)](https://laravel.com)
+[![License](https://img.shields.io/github/license/virgilhawkins00/fiberflow?style=flat-square)](LICENSE)
 
 **FiberFlow** is a revolutionary Laravel queue worker that leverages PHP 8.1+ Fibers to enable **true cooperative multitasking** within a single process. Process 10,000 HTTP requests using only 100MB of RAM by suspending jobs during I/O operations instead of blocking the entire worker.
 
