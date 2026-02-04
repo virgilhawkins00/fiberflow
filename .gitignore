@@ -1,0 +1,37 @@
+# Dependencies
+/vendor/
+composer.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Testing
+.phpunit.cache/
+coverage/
+build/
+.pest/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.backup
+.env.production
+
+# Build artifacts
+*.log
+*.cache
+
+# Project specific
+FiberFlow.md
+composer.lock
+
+# Documentation (keep in repo but ignore local changes)
+# docs/ROADMAP.md
+# docs/ARCHITECTURE.md
