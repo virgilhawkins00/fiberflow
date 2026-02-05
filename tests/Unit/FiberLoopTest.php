@@ -107,3 +107,133 @@ it('initializes with default error handler and recovery manager', function () {
 
     expect($loop)->toBeInstanceOf(FiberLoop::class);
 });
+
+it('creates worker options with default values', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('createWorkerOptions');
+    $method->setAccessible(true);
+
+    $options = $method->invoke($this->loop, []);
+
+    expect($options)->toBeInstanceOf(\Illuminate\Queue\WorkerOptions::class);
+});
+
+it('creates worker options with custom values', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('createWorkerOptions');
+    $method->setAccessible(true);
+
+    $customOptions = [
+        'backoff' => 5,
+        'memory' => 256,
+        'timeout' => 120,
+        'sleep' => 5,
+        'tries' => 3,
+        'force' => true,
+        'stop_when_empty' => true,
+        'max_jobs' => 100,
+        'max_time' => 3600,
+        'rest' => 10,
+    ];
+
+    $options = $method->invoke($this->loop, $customOptions);
+
+    expect($options)->toBeInstanceOf(\Illuminate\Queue\WorkerOptions::class);
+});
+
+it('gets job identifier from job id', function () {
+    $mockJob = Mockery::mock(Job::class);
+    $mockJob->shouldReceive('getJobId')->andReturn('job-123');
+
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('getJobIdentifier');
+    $method->setAccessible(true);
+
+    $identifier = $method->invoke($this->loop, $mockJob);
+
+    expect($identifier)->toBe('job-123');
+});
+
+it('gets job identifier from object hash when no job id', function () {
+    $mockJob = Mockery::mock(Job::class);
+    $mockJob->shouldReceive('getJobId')->andReturn(null);
+
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('getJobIdentifier');
+    $method->setAccessible(true);
+
+    $identifier = $method->invoke($this->loop, $mockJob);
+
+    expect($identifier)->toBeString();
+    expect(strlen($identifier))->toBeGreaterThan(0);
+});
+
+it('handles job exception with error handler', function () {
+    $mockJob = Mockery::mock(Job::class);
+    $mockJob->shouldReceive('getName')->andReturn('TestJob');
+    $mockJob->shouldReceive('fail')->once();
+
+    $exception = new Exception('Test exception');
+
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('handleJobException');
+    $method->setAccessible(true);
+
+    $workerOptions = new \Illuminate\Queue\WorkerOptions;
+
+    $method->invoke($this->loop, $mockJob, $exception, $workerOptions);
+
+    expect(true)->toBeTrue();
+});
+
+it('handles job exception when fail throws exception', function () {
+    $mockJob = Mockery::mock(Job::class);
+    $mockJob->shouldReceive('getName')->andReturn('TestJob');
+    $mockJob->shouldReceive('fail')->andThrow(new Exception('Fail error'));
+
+    $exception = new Exception('Test exception');
+
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('handleJobException');
+    $method->setAccessible(true);
+
+    $workerOptions = new \Illuminate\Queue\WorkerOptions;
+
+    // Should not throw exception
+    $method->invoke($this->loop, $mockJob, $exception, $workerOptions);
+
+    expect(true)->toBeTrue();
+});
+
+it('initiates graceful shutdown', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('initiateGracefulShutdown');
+    $method->setAccessible(true);
+
+    $method->invoke($this->loop, 'SIGTERM');
+
+    $shouldQuitProperty = $reflection->getProperty('shouldQuit');
+    $shouldQuitProperty->setAccessible(true);
+
+    expect($shouldQuitProperty->getValue($this->loop))->toBeTrue();
+});
+
+it('has registerSignalHandlers method', function () {
+    $reflection = new ReflectionClass($this->loop);
+    expect($reflection->hasMethod('registerSignalHandlers'))->toBeTrue();
+});
+
+it('has shutdown method', function () {
+    $reflection = new ReflectionClass($this->loop);
+    expect($reflection->hasMethod('shutdown'))->toBeTrue();
+});
+
+it('has processNextJob method', function () {
+    $reflection = new ReflectionClass($this->loop);
+    expect($reflection->hasMethod('processNextJob'))->toBeTrue();
+});
+
+it('has runJobInFiber method', function () {
+    $reflection = new ReflectionClass($this->loop);
+    expect($reflection->hasMethod('runJobInFiber'))->toBeTrue();
+});
