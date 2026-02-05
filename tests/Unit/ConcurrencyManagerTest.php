@@ -107,3 +107,70 @@ test('it can wait for all fibers to complete', function () {
     expect($completed)->toBe(3);
     expect($manager->getActiveCount())->toBe(0);
 });
+
+test('it handles fiber exceptions and tracks failures', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+
+    try {
+        $manager->spawn(function () {
+            throw new Exception('Test exception');
+        });
+    } catch (Exception $e) {
+        // Exception is expected to be thrown
+    }
+
+    $metrics = $manager->getMetrics();
+    expect($metrics['total_failed'])->toBe(1);
+});
+
+test('it can spawn multiple fibers concurrently', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 5);
+    $results = [];
+
+    for ($i = 0; $i < 5; $i++) {
+        $manager->spawn(function () use (&$results, $i) {
+            $results[] = $i;
+        });
+    }
+
+    expect(count($results))->toBe(5);
+});
+
+test('it respects concurrency limit with multiple spawns', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 3);
+
+    // Spawn 3 fibers that suspend
+    for ($i = 0; $i < 3; $i++) {
+        $manager->spawn(function () {
+            Fiber::suspend();
+        });
+    }
+
+    expect($manager->isFull())->toBeTrue();
+    expect($manager->getAvailableSlots())->toBe(0);
+});
+
+test('it tracks total spawned fibers', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+
+    for ($i = 0; $i < 5; $i++) {
+        $manager->spawn(function () {
+            // Completes immediately
+        });
+    }
+
+    $metrics = $manager->getMetrics();
+    expect($metrics['total_spawned'])->toBe(5);
+});
+
+test('it can check if not full', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 5);
+
+    expect($manager->isFull())->toBeFalse();
+
+    $manager->spawn(function () {
+        Fiber::suspend();
+    });
+
+    expect($manager->isFull())->toBeFalse();
+});
