@@ -230,3 +230,26 @@ test('it gets active fibers list', function () {
     expect($activeFibers)->toContain($fiber1);
     expect($activeFibers)->toContain($fiber2);
 });
+
+test('it waits for suspended fibers to complete', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+    $completed = false;
+
+    $fiber = $manager->spawn(function () use (&$completed) {
+        Fiber::suspend();
+        $completed = true;
+    });
+
+    // Resume the fiber in background
+    $resumeFiber = new Fiber(function () use ($fiber) {
+        usleep(20000); // 20ms
+        if (!$fiber->isTerminated()) {
+            $fiber->resume();
+        }
+    });
+    $resumeFiber->start();
+
+    $manager->waitForAll();
+
+    expect($completed)->toBeTrue();
+});

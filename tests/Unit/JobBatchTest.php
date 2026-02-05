@@ -148,6 +148,12 @@ test('it runs finally callback always', function () {
     expect($calledOnFailure)->toBeTrue();
 });
 
+test('it returns 100% progress for empty batch', function () {
+    $batch = new JobBatch('empty-batch');
+
+    expect($batch->progress())->toBe(100.0);
+});
+
 afterEach(function () {
     Mockery::close();
 });

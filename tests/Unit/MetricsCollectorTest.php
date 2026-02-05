@@ -160,3 +160,17 @@ test('it calculates throughput correctly', function () {
     $throughput = $metrics->get('performance', 'throughput');
     expect($throughput)->toBeGreaterThan(0);
 });
+
+test('it increments non-existent metrics', function () {
+    $metrics = new MetricsCollector;
+
+    $metrics->increment('custom_category', 'custom_metric', 5);
+    expect($metrics->get('custom_category', 'custom_metric'))->toBe(5);
+});
+
+test('it returns default value for non-existent metrics', function () {
+    $metrics = new MetricsCollector;
+
+    $value = $metrics->get('nonexistent', 'metric', 'default');
+    expect($value)->toBe('default');
+});
