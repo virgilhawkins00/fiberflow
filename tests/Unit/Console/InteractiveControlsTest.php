@@ -89,3 +89,94 @@ it('can check if running', function () {
     $this->controls->resume();
     expect($this->controls->isRunning())->toBeTrue();
 });
+
+it('can get available commands', function () {
+    $commands = $this->controls->getCommands();
+
+    expect($commands)->toBeArray();
+    expect($commands)->toHaveKey('p');
+    expect($commands)->toHaveKey('r');
+    expect($commands)->toHaveKey('s');
+    expect($commands)->toHaveKey('q');
+    expect($commands)->toHaveKey('h');
+});
+
+it('can process pause input', function () {
+    $result = $this->controls->processInput('p');
+
+    expect($result)->toBeString();
+    expect($this->controls->isPaused())->toBeTrue();
+});
+
+it('can process resume input', function () {
+    $this->controls->pause();
+    $result = $this->controls->processInput('r');
+
+    expect($result)->toBeString();
+    expect($this->controls->isRunning())->toBeTrue();
+});
+
+it('can process stop input', function () {
+    $result = $this->controls->processInput('s');
+
+    expect($result)->toBeString();
+    expect($this->controls->shouldStop())->toBeTrue();
+});
+
+it('can process quit input', function () {
+    $result = $this->controls->processInput('q');
+
+    expect($result)->toBeString();
+    expect($this->controls->shouldStop())->toBeTrue();
+});
+
+it('can process help input', function () {
+    $result = $this->controls->processInput('h');
+
+    expect($result)->toBeString();
+    expect($result)->toContain('Available commands');
+});
+
+it('returns null for unknown input', function () {
+    $result = $this->controls->processInput('x');
+
+    expect($result)->toBeNull();
+});
+
+it('handles pause when already paused', function () {
+    $this->controls->pause();
+    $result = $this->controls->processInput('p');
+
+    expect($result)->toContain('already paused');
+});
+
+it('handles resume when already running', function () {
+    $result = $this->controls->processInput('r');
+
+    expect($result)->toContain('already running');
+});
+
+it('has setupSignalHandlers method', function () {
+    $reflection = new ReflectionClass($this->controls);
+    expect($reflection->hasMethod('setupSignalHandlers'))->toBeTrue();
+});
+
+it('has handlePause method', function () {
+    $reflection = new ReflectionClass($this->controls);
+    expect($reflection->hasMethod('handlePause'))->toBeTrue();
+});
+
+it('has handleResume method', function () {
+    $reflection = new ReflectionClass($this->controls);
+    expect($reflection->hasMethod('handleResume'))->toBeTrue();
+});
+
+it('has handleStop method', function () {
+    $reflection = new ReflectionClass($this->controls);
+    expect($reflection->hasMethod('handleStop'))->toBeTrue();
+});
+
+it('has handleHelp method', function () {
+    $reflection = new ReflectionClass($this->controls);
+    expect($reflection->hasMethod('handleHelp'))->toBeTrue();
+});
