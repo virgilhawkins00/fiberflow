@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
-use FiberFlow\Facades\FiberAuth;
+use FiberFlow\Facades\AsyncHttp;
 use FiberFlow\Facades\FiberCache;
 use FiberFlow\Facades\FiberSession;
-use FiberFlow\Facades\AsyncHttp;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,7 +14,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 /**
- * Multi-Tenant Job Example
+ * Multi-Tenant Job Example.
  *
  * Demonstrates how FiberFlow maintains complete isolation
  * between different tenants processing jobs concurrently.
@@ -34,9 +33,8 @@ class MultiTenantJob implements ShouldQueue
     public function __construct(
         public int $tenantId,
         public int $userId,
-        public array $data
-    ) {
-    }
+        public array $data,
+    ) {}
 
     /**
      * Execute the job.
@@ -87,7 +85,7 @@ class MultiTenantJob implements ShouldQueue
                         'auto_sync' => true,
                     ],
                 ];
-            }
+            },
         );
     }
 
@@ -192,4 +190,3 @@ class MultiTenantJob implements ShouldQueue
         ]);
     }
 }
-

@@ -44,7 +44,7 @@ class MemoryLeakDetector
     public function __construct(
         ?int $maxSamples = null,
         ?int $leakThreshold = null,
-        ?int $sampleInterval = null
+        ?int $sampleInterval = null,
     ) {
         $this->maxSamples = $maxSamples ?? config('fiberflow.memory_leak.max_samples', 100);
         $this->leakThreshold = $leakThreshold ?? config('fiberflow.memory_leak.threshold', 10 * 1024 * 1024); // 10MB
@@ -173,7 +173,6 @@ class MemoryLeakDetector
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 }
-

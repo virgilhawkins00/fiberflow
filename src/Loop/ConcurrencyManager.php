@@ -31,9 +31,8 @@ class ConcurrencyManager
      * Create a new concurrency manager instance.
      */
     public function __construct(
-        protected int $maxConcurrency = 50
-    ) {
-    }
+        protected int $maxConcurrency = 50,
+    ) {}
 
     /**
      * Spawn a new Fiber with the given callback.
@@ -44,7 +43,7 @@ class ConcurrencyManager
     {
         if ($this->isFull()) {
             throw new ConcurrencyLimitException(
-                "Maximum concurrency limit of {$this->maxConcurrency} reached"
+                "Maximum concurrency limit of {$this->maxConcurrency} reached",
             );
         }
 
@@ -107,7 +106,7 @@ class ConcurrencyManager
 
         $this->activeFibers = array_filter(
             $this->activeFibers,
-            fn (Fiber $f) => $f !== $fiber
+            fn (Fiber $f) => $f !== $fiber,
         );
     }
 
@@ -118,7 +117,7 @@ class ConcurrencyManager
     {
         $this->activeFibers = array_filter(
             $this->activeFibers,
-            fn (Fiber $fiber) => !$fiber->isTerminated()
+            fn (Fiber $fiber) => ! $fiber->isTerminated(),
         );
     }
 
@@ -163,7 +162,7 @@ class ConcurrencyManager
     public function terminateAll(): void
     {
         foreach ($this->activeFibers as $fiber) {
-            if (!$fiber->isTerminated()) {
+            if (! $fiber->isTerminated()) {
                 // Fibers will be cleaned up by garbage collector
             }
         }
@@ -171,4 +170,3 @@ class ConcurrencyManager
         $this->activeFibers = [];
     }
 }
-

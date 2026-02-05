@@ -19,7 +19,7 @@ class FiberCrashException extends FiberException
         int $code = 0,
         ?Throwable $previous = null,
         protected ?string $fiberId = null,
-        protected ?string $jobClass = null
+        protected ?string $jobClass = null,
     ) {
         parent::__construct($message, $code, $previous);
     }
@@ -52,8 +52,7 @@ class FiberCrashException extends FiberException
             message: "Fiber {$fiberId} crashed while processing job {$jobClass}: {$previous->getMessage()}",
             previous: $previous,
             fiberId: $fiberId,
-            jobClass: $jobClass
+            jobClass: $jobClass,
         );
     }
 }
-

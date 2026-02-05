@@ -97,4 +97,3 @@ test('it isolates context between fibers', function () {
     expect($value1)->toBe('Alice');
     expect($value2)->toBe('Bob');
 });
-

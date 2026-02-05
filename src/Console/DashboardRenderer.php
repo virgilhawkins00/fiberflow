@@ -16,9 +16,8 @@ class DashboardRenderer
      */
     public function __construct(
         protected MetricsCollector $metrics,
-        protected ?DashboardController $controller = null
-    ) {
-    }
+        protected ?DashboardController $controller = null,
+    ) {}
 
     /**
      * Render the dashboard.
@@ -81,7 +80,7 @@ HEADER;
         return <<<JOBS
 ┌─ Jobs ────────────────────────────────────────────────────────────────────────┐
 │  Total Processed: {$this->pad($processed, 10)}  Failed: {$this->pad($failed, 10)}  Retried: {$this->pad($retried, 10)}  │
-│  Success Rate:    {$this->pad($successRate . '%', 10)}                                              │
+│  Success Rate:    {$this->pad($successRate.'%', 10)}                                              │
 └───────────────────────────────────────────────────────────────────────────────┘
 
 JOBS;
@@ -142,7 +141,7 @@ MEMORY;
 
         return <<<PERFORMANCE
 ┌─ Performance ─────────────────────────────────────────────────────────────────┐
-│  Throughput:  {$this->pad($throughput . ' jobs/s', 15)}  Avg Job Time: {$this->pad($avgJobTime . ' ms', 15)}  │
+│  Throughput:  {$this->pad($throughput.' jobs/s', 15)}  Avg Job Time: {$this->pad($avgJobTime.' ms', 15)}  │
 │  Uptime:      {$this->pad($uptime, 15)}                                              │
 └───────────────────────────────────────────────────────────────────────────────┘
 
@@ -155,7 +154,7 @@ PERFORMANCE;
     protected function renderFooter(): string
     {
         if ($this->controller !== null) {
-            return "\n" . $this->controller->getHelpText() . "\n";
+            return "\n".$this->controller->getHelpText()."\n";
         }
 
         return "\nPress Ctrl+C to stop the worker\n";
@@ -170,7 +169,7 @@ PERFORMANCE;
         $filled = (int) round(($percentage / 100) * $width);
         $empty = $width - $filled;
 
-        return '[' . str_repeat('█', $filled) . str_repeat('░', $empty) . ']';
+        return '['.str_repeat('█', $filled).str_repeat('░', $empty).']';
     }
 
     /**
@@ -192,7 +191,7 @@ PERFORMANCE;
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 
     /**
@@ -213,4 +212,3 @@ PERFORMANCE;
         }
     }
 }
-

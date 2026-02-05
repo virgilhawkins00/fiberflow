@@ -85,7 +85,7 @@ test('it builds complex query', function () {
         ->once()
         ->with(
             'SELECT id, name FROM users WHERE status = ? AND role = ? ORDER BY created_at DESC LIMIT 5 OFFSET 10',
-            ['active', 'admin']
+            ['active', 'admin'],
         )
         ->andReturn([]);
 
@@ -151,4 +151,3 @@ test('it supports custom operators in where', function () {
 
     $this->builder->where('age', '>', 18)->get();
 });
-

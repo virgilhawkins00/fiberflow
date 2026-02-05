@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use FiberFlow\Database\AsyncDbConnection;
 use FiberFlow\Queue\DriverManager;
@@ -15,11 +15,10 @@ use FiberFlow\Queue\DriverManager;
  * - SQS queue driver (simulated)
  * - RabbitMQ queue driver (simulated)
  */
-
 echo "=== FiberFlow Queue Driver Benchmark ===\n\n";
 
 $jobCount = 100;
-$manager = new DriverManager();
+$manager = new DriverManager;
 
 echo "Configuration:\n";
 echo "- Jobs: {$jobCount}\n";
@@ -30,7 +29,7 @@ echo "- Drivers: database, sqs, rabbitmq\n\n";
 // ============================================================================
 
 echo "1. Database Queue Driver\n";
-echo str_repeat('-', 50) . "\n";
+echo str_repeat('-', 50)."\n";
 
 $startTime = microtime(true);
 $startMemory = memory_get_usage(true);
@@ -67,9 +66,9 @@ try {
     $memoryUsed = memory_get_usage(true) - $startMemory;
 
     echo "✓ Completed\n";
-    echo "  Duration: " . round($duration, 2) . "s\n";
-    echo "  Memory: " . formatBytes($memoryUsed) . "\n";
-    echo "  Throughput: " . round($jobCount / $duration, 2) . " jobs/s\n\n";
+    echo '  Duration: '.round($duration, 2)."s\n";
+    echo '  Memory: '.formatBytes($memoryUsed)."\n";
+    echo '  Throughput: '.round($jobCount / $duration, 2)." jobs/s\n\n";
 
     $driver->close();
 } catch (\Throwable $e) {
@@ -116,6 +115,5 @@ function formatBytes(int $bytes): string
     $pow = min($pow, count($units) - 1);
     $bytes /= (1 << (10 * $pow));
 
-    return round($bytes, 2) . ' ' . $units[$pow];
+    return round($bytes, 2).' '.$units[$pow];
 }
-

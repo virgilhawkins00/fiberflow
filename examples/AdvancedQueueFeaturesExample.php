@@ -52,15 +52,15 @@ class NormalJob implements ShouldQueue
 
 function priorityQueueExample(): void
 {
-    $queue = new PriorityQueue();
+    $queue = new PriorityQueue;
 
     // Add jobs with different priorities
-    $queue->push(new NormalJob(), priority: 1);
-    $queue->push(new CriticalJob(), priority: 10); // Higher priority
-    $queue->push(new NormalJob(), priority: 1);
+    $queue->push(new NormalJob, priority: 1);
+    $queue->push(new CriticalJob, priority: 10); // Higher priority
+    $queue->push(new NormalJob, priority: 1);
 
     // Process jobs - CriticalJob will be processed first
-    while (!$queue->isEmpty()) {
+    while (! $queue->isEmpty()) {
         $job = $queue->pop();
         $job->handle();
     }
@@ -76,9 +76,8 @@ class ScheduledNotificationJob implements ShouldQueue
 
     public function __construct(
         protected string $message,
-        protected int $userId
-    ) {
-    }
+        protected int $userId,
+    ) {}
 
     public function handle(): void
     {
@@ -88,7 +87,7 @@ class ScheduledNotificationJob implements ShouldQueue
 
 function delayedJobExample(): void
 {
-    $queue = new DelayedJobQueue();
+    $queue = new DelayedJobQueue;
 
     // Schedule jobs for future execution
     $queue->push(new ScheduledNotificationJob('Reminder: Meeting in 1 hour', 123), delay: 3600);
@@ -123,9 +122,8 @@ class DataProcessingJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        protected int $recordId
-    ) {
-    }
+        protected int $recordId,
+    ) {}
 
     public function handle(): void
     {
@@ -177,9 +175,8 @@ class ApiCallJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        protected string $endpoint
-    ) {
-    }
+        protected string $endpoint,
+    ) {}
 
     public function handle(): void
     {
@@ -241,4 +238,3 @@ function queueConcurrencyExample(): void
         }
     }
 }
-

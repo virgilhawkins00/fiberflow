@@ -31,9 +31,8 @@ class DataScrapingJob implements ShouldQueue
      */
     public function __construct(
         public array $urls,
-        public string $cacheKey
-    ) {
-    }
+        public string $cacheKey,
+    ) {}
 
     /**
      * Execute the job.
@@ -115,4 +114,3 @@ class DataScrapingJob implements ShouldQueue
         return null;
     }
 }
-

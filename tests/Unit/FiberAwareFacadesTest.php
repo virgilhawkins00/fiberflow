@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-use FiberFlow\Facades\FiberAuth;
-use FiberFlow\Facades\FiberCache;
-use FiberFlow\Facades\FiberSession;
 use FiberFlow\Coroutine\FiberContext;
 use FiberFlow\Coroutine\SandboxManager;
+use FiberFlow\Facades\FiberCache;
+use FiberFlow\Facades\FiberSession;
 
 beforeEach(function () {
     // Register SandboxManager in container
@@ -90,9 +89,9 @@ test('FiberSession can retrieve all fiber-local data', function () {
     $fiber = new Fiber(function () {
         FiberSession::fiberPut('key1', 'value1');
         FiberSession::fiberPut('key2', 'value2');
-        
+
         $all = FiberSession::fiberAll();
-        
+
         expect($all)->toHaveKey('key1');
         expect($all)->toHaveKey('key2');
         expect($all['key1'])->toBe('value1');
@@ -107,7 +106,7 @@ test('FiberSession can forget fiber-local values', function () {
     $fiber = new Fiber(function () {
         FiberSession::fiberPut('temp_key', 'temp_value');
         expect(FiberSession::fiberHas('temp_key'))->toBeTrue();
-        
+
         FiberSession::fiberForget('temp_key');
         expect(FiberSession::fiberHas('temp_key'))->toBeFalse();
     });
@@ -120,11 +119,11 @@ test('FiberSession can clear all fiber-local data', function () {
     $fiber = new Fiber(function () {
         FiberSession::fiberPut('key1', 'value1');
         FiberSession::fiberPut('key2', 'value2');
-        
+
         expect(FiberSession::fiberAll())->toHaveCount(2);
-        
+
         FiberSession::clearFiberSession();
-        
+
         expect(FiberSession::fiberAll())->toHaveCount(0);
     });
 
@@ -149,10 +148,10 @@ test('fiber-aware facades isolate state between fibers', function () {
     $fiber1 = new Fiber(function () use (&$results) {
         FiberCache::contextPut('tenant_id', 'tenant_1');
         FiberSession::fiberPut('user_id', 100);
-        
+
         // Simulate some work
         usleep(1000);
-        
+
         $results['fiber1'] = [
             'tenant' => FiberCache::contextGet('tenant_id'),
             'user' => FiberSession::fiberGet('user_id'),
@@ -162,10 +161,10 @@ test('fiber-aware facades isolate state between fibers', function () {
     $fiber2 = new Fiber(function () use (&$results) {
         FiberCache::contextPut('tenant_id', 'tenant_2');
         FiberSession::fiberPut('user_id', 200);
-        
+
         // Simulate some work
         usleep(1000);
-        
+
         $results['fiber2'] = [
             'tenant' => FiberCache::contextGet('tenant_id'),
             'user' => FiberSession::fiberGet('user_id'),
@@ -176,7 +175,7 @@ test('fiber-aware facades isolate state between fibers', function () {
     $fiber2->start();
 
     // Wait for completion
-    while (!$fiber1->isTerminated() || !$fiber2->isTerminated()) {
+    while (! $fiber1->isTerminated() || ! $fiber2->isTerminated()) {
         usleep(100);
     }
 
@@ -186,4 +185,3 @@ test('fiber-aware facades isolate state between fibers', function () {
     expect($results['fiber2']['tenant'])->toBe('tenant_2');
     expect($results['fiber2']['user'])->toBe(200);
 });
-

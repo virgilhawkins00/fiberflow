@@ -62,7 +62,7 @@ class SqsQueueDriver implements AsyncQueueDriver
         }
 
         $response = $this->makeRequest('POST', $params);
-        
+
         // Parse message ID from response
         if (preg_match('/<MessageId>(.*?)<\/MessageId>/', $response, $matches)) {
             return $matches[1];
@@ -86,11 +86,11 @@ class SqsQueueDriver implements AsyncQueueDriver
         $response = $this->makeRequest('POST', $params);
 
         // Parse message from response
-        if (!preg_match('/<Body>(.*?)<\/Body>/', $response, $bodyMatches)) {
+        if (! preg_match('/<Body>(.*?)<\/Body>/', $response, $bodyMatches)) {
             return null;
         }
 
-        if (!preg_match('/<ReceiptHandle>(.*?)<\/ReceiptHandle>/', $response, $handleMatches)) {
+        if (! preg_match('/<ReceiptHandle>(.*?)<\/ReceiptHandle>/', $response, $handleMatches)) {
             return null;
         }
 
@@ -102,7 +102,7 @@ class SqsQueueDriver implements AsyncQueueDriver
                 'ReceiptHandle' => $handleMatches[1],
             ],
             app('queue')->connection(),
-            $queue
+            $queue,
         );
     }
 
@@ -197,13 +197,14 @@ class SqsQueueDriver implements AsyncQueueDriver
      */
     protected function makeRequest(string $method, array $params): string
     {
-        $url = $this->queueUrl . '?' . http_build_query($params);
+        $url = $this->queueUrl.'?'.http_build_query($params);
         $request = new Request($url, $method);
 
         // Add AWS signature headers (simplified - production would use AWS SDK)
         $request->setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
         $response = $this->client->request($request);
+
         return $response->getBody()->buffer();
     }
 
@@ -212,7 +213,6 @@ class SqsQueueDriver implements AsyncQueueDriver
      */
     protected function getQueueUrl(string $queue): string
     {
-        return $this->queueUrl . '/' . $queue;
+        return $this->queueUrl.'/'.$queue;
     }
 }
-

@@ -38,9 +38,9 @@ class SandboxManager
     public function __construct(Container $container, ?ContainerPollutionDetector $detector = null)
     {
         $this->baseContainer = $container;
-        $this->fiberContainers = new WeakMap();
+        $this->fiberContainers = new WeakMap;
         $this->enabled = config('fiberflow.sandbox_enabled', true);
-        $this->pollutionDetector = $detector ?? new ContainerPollutionDetector();
+        $this->pollutionDetector = $detector ?? new ContainerPollutionDetector;
     }
 
     /**
@@ -48,7 +48,7 @@ class SandboxManager
      */
     public function createSandbox(): Container
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return $this->baseContainer;
         }
 
@@ -77,7 +77,7 @@ class SandboxManager
      */
     public function getCurrentContainer(): Container
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return $this->baseContainer;
         }
 
@@ -95,7 +95,7 @@ class SandboxManager
      */
     public function destroySandbox(): void
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return;
         }
 
@@ -117,7 +117,7 @@ class SandboxManager
      */
     public function hasSandbox(): bool
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return false;
         }
 
@@ -135,7 +135,7 @@ class SandboxManager
      */
     public function getActiveSandboxCount(): int
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return 0;
         }
 
@@ -179,7 +179,7 @@ class SandboxManager
      */
     public function verifyIntegrity(): void
     {
-        if (!$this->enabled || $this->pollutionDetector === null) {
+        if (! $this->enabled || $this->pollutionDetector === null) {
             return;
         }
 
@@ -195,4 +195,3 @@ class SandboxManager
         return $this->pollutionDetector;
     }
 }
-

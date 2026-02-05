@@ -26,4 +26,3 @@ class AsyncHttp extends Facade
         return 'fiberflow.http';
     }
 }
-

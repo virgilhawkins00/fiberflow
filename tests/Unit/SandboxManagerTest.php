@@ -6,7 +6,7 @@ use FiberFlow\Coroutine\SandboxManager;
 use Illuminate\Container\Container;
 
 test('it creates a sandbox for a fiber', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
 
     $fiber = new Fiber(function () use ($manager) {
@@ -19,7 +19,7 @@ test('it creates a sandbox for a fiber', function () {
 });
 
 test('it returns base container when not in a fiber', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
 
     $container = $manager->getCurrentContainer();
@@ -28,7 +28,7 @@ test('it returns base container when not in a fiber', function () {
 });
 
 test('it returns sandbox when in a fiber', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
 
     $fiber = new Fiber(function () use ($manager, $baseContainer) {
@@ -43,7 +43,7 @@ test('it returns sandbox when in a fiber', function () {
 });
 
 test('it can check if fiber has sandbox', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
 
     expect($manager->hasSandbox())->toBeFalse();
@@ -57,7 +57,7 @@ test('it can check if fiber has sandbox', function () {
 });
 
 test('it can destroy sandbox', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
 
     $fiber = new Fiber(function () use ($manager) {
@@ -72,7 +72,7 @@ test('it can destroy sandbox', function () {
 });
 
 test('it can be disabled', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
     $manager->setEnabled(false);
 
@@ -85,7 +85,7 @@ test('it can be disabled', function () {
 });
 
 test('it isolates state between fibers', function () {
-    $baseContainer = new Container();
+    $baseContainer = new Container;
     $manager = new SandboxManager($baseContainer);
 
     $value1 = null;
@@ -109,4 +109,3 @@ test('it isolates state between fibers', function () {
     expect($value1)->toBe('fiber1');
     expect($value2)->toBe('fiber2');
 });
-

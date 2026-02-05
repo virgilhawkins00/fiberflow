@@ -27,7 +27,7 @@ class AsyncDbClient
      */
     public function __construct(
         protected int $poolSize = 10,
-        protected int $timeout = 5
+        protected int $timeout = 5,
     ) {
         $this->enabled = config('fiberflow.database.enabled', false);
 
@@ -48,8 +48,8 @@ class AsyncDbClient
                 Config::get('database.connections.mysql.port', 3306),
                 Config::get('database.connections.mysql.username', 'root'),
                 Config::get('database.connections.mysql.password', ''),
-                Config::get('database.connections.mysql.database', 'laravel')
-            )
+                Config::get('database.connections.mysql.database', 'laravel'),
+            ),
         );
 
         $this->pool = new MysqlConnectionPool($config, $this->poolSize);
@@ -59,11 +59,12 @@ class AsyncDbClient
      * Execute a SELECT query.
      *
      * @param array<int, mixed> $bindings
+     *
      * @return array<int, array<string, mixed>>
      */
     public function select(string $sql, array $bindings = []): array
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
@@ -77,7 +78,7 @@ class AsyncDbClient
      */
     public function insert(string $sql, array $bindings = []): int
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
@@ -93,7 +94,7 @@ class AsyncDbClient
      */
     public function update(string $sql, array $bindings = []): int
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
@@ -109,7 +110,7 @@ class AsyncDbClient
      */
     public function delete(string $sql, array $bindings = []): int
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
@@ -122,11 +123,12 @@ class AsyncDbClient
      * Execute a raw query.
      *
      * @param array<int, mixed> $bindings
+     *
      * @return array<int, array<string, mixed>>
      */
     public function query(string $sql, array $bindings = []): array
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
@@ -143,6 +145,7 @@ class AsyncDbClient
      * Execute an async query (suspends the current Fiber).
      *
      * @param array<int, mixed> $bindings
+     *
      * @return array<int, array<string, mixed>>
      */
     protected function queryAsync(string $sql, array $bindings): array
@@ -178,6 +181,7 @@ class AsyncDbClient
      * Execute a synchronous query (blocks).
      *
      * @param array<int, mixed> $bindings
+     *
      * @return array<int, array<string, mixed>>
      */
     protected function querySync(string $sql, array $bindings): array
@@ -203,4 +207,3 @@ class AsyncDbClient
         }
     }
 }
-

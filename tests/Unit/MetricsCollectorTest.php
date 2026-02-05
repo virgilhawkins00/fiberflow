@@ -5,7 +5,7 @@ declare(strict_types=1);
 use FiberFlow\Metrics\MetricsCollector;
 
 test('it initializes with default metrics', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
     $all = $metrics->getAllMetrics();
 
     expect($all)->toHaveKey('jobs');
@@ -17,7 +17,7 @@ test('it initializes with default metrics', function () {
 });
 
 test('it can increment counters', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->increment('jobs', 'processed');
     expect($metrics->get('jobs', 'processed'))->toBe(1);
@@ -27,14 +27,14 @@ test('it can increment counters', function () {
 });
 
 test('it can set metric values', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->set('custom', 'value', 42);
     expect($metrics->get('custom', 'value'))->toBe(42);
 });
 
 test('it records job completions correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordJobCompleted(0.5);
     expect($metrics->get('jobs', 'processed'))->toBe(1);
@@ -48,7 +48,7 @@ test('it records job completions correctly', function () {
 });
 
 test('it records job failures correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordJobFailed();
     expect($metrics->get('jobs', 'failed'))->toBe(1);
@@ -56,14 +56,14 @@ test('it records job failures correctly', function () {
 });
 
 test('it records job retries correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordJobRetried();
     expect($metrics->get('jobs', 'retried'))->toBe(1);
 });
 
 test('it records fiber spawns correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordFiberSpawned();
     expect($metrics->get('fibers', 'spawned'))->toBe(1);
@@ -75,7 +75,7 @@ test('it records fiber spawns correctly', function () {
 });
 
 test('it records fiber completions correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordFiberSpawned();
     $metrics->recordFiberCompleted();
@@ -85,7 +85,7 @@ test('it records fiber completions correctly', function () {
 });
 
 test('it records fiber failures correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordFiberSpawned();
     $metrics->recordFiberFailed();
@@ -95,7 +95,7 @@ test('it records fiber failures correctly', function () {
 });
 
 test('it updates memory metrics', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->updateMemoryMetrics();
 
@@ -104,7 +104,7 @@ test('it updates memory metrics', function () {
 });
 
 test('it updates performance metrics', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     // Record some jobs
     $metrics->recordJobCompleted(0.1);
@@ -117,7 +117,7 @@ test('it updates performance metrics', function () {
 });
 
 test('it can get a snapshot of metrics', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordJobCompleted(0.5);
     $metrics->recordFiberSpawned();
@@ -131,7 +131,7 @@ test('it can get a snapshot of metrics', function () {
 });
 
 test('it can reset all metrics', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     $metrics->recordJobCompleted(0.5);
     $metrics->recordFiberSpawned();
@@ -145,7 +145,7 @@ test('it can reset all metrics', function () {
 });
 
 test('it calculates throughput correctly', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
 
     // Simulate processing 10 jobs
     for ($i = 0; $i < 10; $i++) {
@@ -160,4 +160,3 @@ test('it calculates throughput correctly', function () {
     $throughput = $metrics->get('performance', 'throughput');
     expect($throughput)->toBeGreaterThan(0);
 });
-

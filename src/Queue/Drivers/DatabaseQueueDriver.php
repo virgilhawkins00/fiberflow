@@ -24,9 +24,8 @@ class DatabaseQueueDriver implements AsyncQueueDriver
      */
     public function __construct(
         protected AsyncDbConnection $connection,
-        protected string $default = 'default'
-    ) {
-    }
+        protected string $default = 'default',
+    ) {}
 
     /**
      * Push a job onto the queue.
@@ -60,7 +59,7 @@ class DatabaseQueueDriver implements AsyncQueueDriver
              AND reserved_at IS NULL 
              ORDER BY id ASC 
              LIMIT 1",
-            [$queue, time()]
+            [$queue, time()],
         );
 
         if ($job === null) {
@@ -74,7 +73,7 @@ class DatabaseQueueDriver implements AsyncQueueDriver
                 'reserved_at' => time(),
                 'attempts' => $job['attempts'] + 1,
             ],
-            ['id' => $job['id']]
+            ['id' => $job['id']],
         );
 
         return new DatabaseJob(
@@ -82,7 +81,7 @@ class DatabaseQueueDriver implements AsyncQueueDriver
             app('db')->connection(),
             $job,
             app('queue')->connection(),
-            $queue
+            $queue,
         );
     }
 
@@ -107,7 +106,7 @@ class DatabaseQueueDriver implements AsyncQueueDriver
                 'reserved_at' => null,
                 'available_at' => $availableAt,
             ],
-            ['id' => (int) $jobId]
+            ['id' => (int) $jobId],
         );
     }
 
@@ -118,7 +117,7 @@ class DatabaseQueueDriver implements AsyncQueueDriver
     {
         $result = $this->connection->fetchOne(
             "SELECT COUNT(*) as count FROM {$this->table} WHERE queue = ?",
-            [$queue]
+            [$queue],
         );
 
         return (int) ($result['count'] ?? 0);
@@ -162,7 +161,7 @@ class DatabaseQueueDriver implements AsyncQueueDriver
     public function setTable(string $table): self
     {
         $this->table = $table;
+
         return $this;
     }
 }
-

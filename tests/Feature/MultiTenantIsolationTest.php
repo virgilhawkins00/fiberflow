@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use FiberFlow\Coroutine\ContainerPollutionDetector;
+use FiberFlow\Coroutine\SandboxManager;
 use FiberFlow\Facades\FiberCache;
 use FiberFlow\Facades\FiberSession;
-use FiberFlow\Coroutine\SandboxManager;
-use FiberFlow\Coroutine\ContainerPollutionDetector;
 use Illuminate\Container\Container;
 
 test('multiple tenants can process jobs concurrently without state leakage', function () {
@@ -63,7 +63,7 @@ test('multiple tenants can process jobs concurrently without state leakage', fun
     $tenant3Fiber->start();
 
     // Wait for all to complete
-    while (!$tenant1Fiber->isTerminated() || !$tenant2Fiber->isTerminated() || !$tenant3Fiber->isTerminated()) {
+    while (! $tenant1Fiber->isTerminated() || ! $tenant2Fiber->isTerminated() || ! $tenant3Fiber->isTerminated()) {
         usleep(1000);
     }
 
@@ -82,7 +82,7 @@ test('multiple tenants can process jobs concurrently without state leakage', fun
 });
 
 test('sandbox manager creates isolated containers per fiber', function () {
-    $container = new Container();
+    $container = new Container;
     $sandboxManager = new SandboxManager($container);
 
     $sandboxes = [];
@@ -105,15 +105,15 @@ test('sandbox manager creates isolated containers per fiber', function () {
 });
 
 test('container pollution detector takes snapshots correctly', function () {
-    $container = new Container();
-    $detector = new ContainerPollutionDetector();
+    $container = new Container;
+    $detector = new ContainerPollutionDetector;
 
     $fiber = new Fiber(function () use ($container, $detector) {
         $detector->takeSnapshot($container);
-        
+
         // Verify without changes - should pass
         $detector->verify($container);
-        
+
         expect(true)->toBeTrue();
     });
 
@@ -147,25 +147,25 @@ test('session data is isolated between concurrent fibers', function () {
     $fiber1 = new Fiber(function () use (&$sessionData) {
         FiberSession::fiberPut('order_id', 'ORD-001');
         FiberSession::fiberPut('total', 99.99);
-        
+
         usleep(2000);
-        
+
         $sessionData['fiber1'] = FiberSession::fiberAll();
     });
 
     $fiber2 = new Fiber(function () use (&$sessionData) {
         FiberSession::fiberPut('order_id', 'ORD-002');
         FiberSession::fiberPut('total', 149.99);
-        
+
         usleep(2000);
-        
+
         $sessionData['fiber2'] = FiberSession::fiberAll();
     });
 
     $fiber1->start();
     $fiber2->start();
 
-    while (!$fiber1->isTerminated() || !$fiber2->isTerminated()) {
+    while (! $fiber1->isTerminated() || ! $fiber2->isTerminated()) {
         usleep(500);
     }
 
@@ -204,10 +204,10 @@ test('zero state leakage between 10 concurrent fibers', function () {
 
     // Wait for all to complete
     $allTerminated = false;
-    while (!$allTerminated) {
+    while (! $allTerminated) {
         $allTerminated = true;
         foreach ($fibers as $fiber) {
-            if (!$fiber->isTerminated()) {
+            if (! $fiber->isTerminated()) {
                 $allTerminated = false;
                 break;
             }
@@ -222,4 +222,3 @@ test('zero state leakage between 10 concurrent fibers', function () {
         expect($results[$i]['user_id'])->toBe($i * 100);
     }
 });
-

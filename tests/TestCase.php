@@ -40,4 +40,3 @@ abstract class TestCase extends Orchestra
         config()->set('fiberflow', require __DIR__.'/../config/fiberflow.php');
     }
 }
-

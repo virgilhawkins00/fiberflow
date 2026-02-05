@@ -7,14 +7,14 @@ use FiberFlow\Exceptions\FiberCrashException;
 use FiberFlow\Metrics\MetricsCollector;
 
 test('it registers default handlers', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
 
     expect($handler->hasHandler(FiberCrashException::class))->toBeTrue();
     expect($handler->hasHandler(Throwable::class))->toBeTrue();
 });
 
 test('it can register custom handlers', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
     $called = false;
 
     $handler->register(RuntimeException::class, function () use (&$called) {
@@ -28,7 +28,7 @@ test('it can register custom handlers', function () {
 });
 
 test('it handles exceptions with specific handlers', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
     $message = null;
 
     $handler->register(InvalidArgumentException::class, function ($e) use (&$message) {
@@ -41,8 +41,10 @@ test('it handles exceptions with specific handlers', function () {
 
 test('it falls back to parent class handlers', function () {
     // Create handler without default handlers to test inheritance
-    $handler = new class extends \FiberFlow\ErrorHandling\ErrorHandler {
-        public function __construct() {
+    $handler = new class extends \FiberFlow\ErrorHandling\ErrorHandler
+    {
+        public function __construct()
+        {
             // Skip default handlers registration
         }
     };
@@ -62,7 +64,7 @@ test('it falls back to parent class handlers', function () {
 });
 
 test('it can wrap callables with error handling', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
     $exceptionHandled = false;
 
     $handler->register(RuntimeException::class, function () use (&$exceptionHandled) {
@@ -78,7 +80,7 @@ test('it can wrap callables with error handling', function () {
 });
 
 test('it returns result from wrapped callable on success', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
 
     $result = $handler->wrap(function () {
         return 42;
@@ -88,7 +90,7 @@ test('it returns result from wrapped callable on success', function () {
 });
 
 test('it can unregister handlers', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
 
     $handler->register(RuntimeException::class, fn () => null);
     expect($handler->hasHandler(RuntimeException::class))->toBeTrue();
@@ -98,11 +100,11 @@ test('it can unregister handlers', function () {
 });
 
 test('it handles Fiber crashes', function () {
-    $metrics = new MetricsCollector();
+    $metrics = new MetricsCollector;
     $handler = new ErrorHandler($metrics);
 
     $fiber = new Fiber(fn () => null);
-    $job = new stdClass();
+    $job = new stdClass;
     $exception = new RuntimeException('crash');
 
     $handler->handleFiberCrash($fiber, $job, $exception);
@@ -112,7 +114,7 @@ test('it handles Fiber crashes', function () {
 });
 
 test('it gets all registered handlers', function () {
-    $handler = new ErrorHandler();
+    $handler = new ErrorHandler;
 
     $handlers = $handler->getHandlers();
 
@@ -120,4 +122,3 @@ test('it gets all registered handlers', function () {
     expect($handlers)->toHaveKey(FiberCrashException::class);
     expect($handlers)->toHaveKey(Throwable::class);
 });
-

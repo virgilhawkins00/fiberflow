@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * FiberFlow HTTP Benchmark
+ * FiberFlow HTTP Benchmark.
  *
  * Compares performance of FiberFlow vs traditional synchronous approach
  * for I/O-heavy workloads (HTTP requests).
@@ -20,6 +20,7 @@ use FiberFlow\Loop\ConcurrencyManager;
 class HttpBenchmark
 {
     protected int $numRequests = 50;
+
     protected string $testUrl = 'https://httpbin.org/delay/1';
 
     public function run(): void
@@ -61,9 +62,9 @@ class HttpBenchmark
             'throughput' => $this->numRequests / $duration,
         ];
 
-        echo "  ✓ Completed in " . round($duration, 2) . "s\n";
-        echo "  ✓ Memory: " . $this->formatBytes($memoryUsed) . "\n";
-        echo "  ✓ Throughput: " . round($this->traditionalResults['throughput'], 2) . " req/s\n";
+        echo '  ✓ Completed in '.round($duration, 2)."s\n";
+        echo '  ✓ Memory: '.$this->formatBytes($memoryUsed)."\n";
+        echo '  ✓ Throughput: '.round($this->traditionalResults['throughput'], 2)." req/s\n";
         echo "\n";
     }
 
@@ -71,7 +72,7 @@ class HttpBenchmark
     {
         echo "Running FiberFlow Concurrent Approach...\n";
 
-        $client = new AsyncHttpClient();
+        $client = new AsyncHttpClient;
         $concurrency = new ConcurrencyManager(maxConcurrency: 50);
 
         $startTime = microtime(true);
@@ -104,9 +105,9 @@ class HttpBenchmark
             'throughput' => $this->numRequests / $duration,
         ];
 
-        echo "  ✓ Completed in " . round($duration, 2) . "s\n";
-        echo "  ✓ Memory: " . $this->formatBytes($memoryUsed) . "\n";
-        echo "  ✓ Throughput: " . round($this->fiberFlowResults['throughput'], 2) . " req/s\n";
+        echo '  ✓ Completed in '.round($duration, 2)."s\n";
+        echo '  ✓ Memory: '.$this->formatBytes($memoryUsed)."\n";
+        echo '  ✓ Throughput: '.round($this->fiberFlowResults['throughput'], 2)." req/s\n";
         echo "\n";
     }
 
@@ -122,22 +123,22 @@ class HttpBenchmark
         $memoryRatio = $this->traditionalResults['memory'] / max($this->fiberFlowResults['memory'], 1);
 
         echo "Speed Improvement:\n";
-        echo "  Traditional: " . round($this->traditionalResults['duration'], 2) . "s\n";
-        echo "  FiberFlow:   " . round($this->fiberFlowResults['duration'], 2) . "s\n";
-        echo "  → " . round($speedup, 1) . "x FASTER 🚀\n";
+        echo '  Traditional: '.round($this->traditionalResults['duration'], 2)."s\n";
+        echo '  FiberFlow:   '.round($this->fiberFlowResults['duration'], 2)."s\n";
+        echo '  → '.round($speedup, 1)."x FASTER 🚀\n";
         echo "\n";
 
         echo "Throughput Improvement:\n";
-        echo "  Traditional: " . round($this->traditionalResults['throughput'], 2) . " req/s\n";
-        echo "  FiberFlow:   " . round($this->fiberFlowResults['throughput'], 2) . " req/s\n";
-        echo "  → " . round($throughputGain, 1) . "x HIGHER 📈\n";
+        echo '  Traditional: '.round($this->traditionalResults['throughput'], 2)." req/s\n";
+        echo '  FiberFlow:   '.round($this->fiberFlowResults['throughput'], 2)." req/s\n";
+        echo '  → '.round($throughputGain, 1)."x HIGHER 📈\n";
         echo "\n";
 
         echo "Memory Efficiency:\n";
-        echo "  Traditional: " . $this->formatBytes($this->traditionalResults['memory']) . "\n";
-        echo "  FiberFlow:   " . $this->formatBytes($this->fiberFlowResults['memory']) . "\n";
+        echo '  Traditional: '.$this->formatBytes($this->traditionalResults['memory'])."\n";
+        echo '  FiberFlow:   '.$this->formatBytes($this->fiberFlowResults['memory'])."\n";
         if ($memoryRatio > 1) {
-            echo "  → " . round($memoryRatio, 1) . "x LESS MEMORY 💾\n";
+            echo '  → '.round($memoryRatio, 1)."x LESS MEMORY 💾\n";
         } else {
             echo "  → Similar memory usage\n";
         }
@@ -152,14 +153,14 @@ class HttpBenchmark
         $pow = min($pow, count($units) - 1);
         $bytes /= (1 << (10 * $pow));
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 
     protected array $traditionalResults = [];
+
     protected array $fiberFlowResults = [];
 }
 
 // Run the benchmark
-$benchmark = new HttpBenchmark();
+$benchmark = new HttpBenchmark;
 $benchmark->run();
-

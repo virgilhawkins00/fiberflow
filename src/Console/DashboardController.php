@@ -18,8 +18,11 @@ class DashboardController
      * Available states.
      */
     protected const STATE_RUNNING = 'running';
+
     protected const STATE_PAUSED = 'paused';
+
     protected const STATE_STOPPING = 'stopping';
+
     protected const STATE_STOPPED = 'stopped';
 
     /**
@@ -139,4 +142,3 @@ Controls:
 HELP;
     }
 }
-

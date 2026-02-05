@@ -8,7 +8,7 @@ use FiberFlow\Coroutine\FiberContext;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Fiber-aware Auth Facade
+ * Fiber-aware Auth Facade.
  *
  * Provides authentication functionality with Fiber isolation.
  * Each Fiber maintains its own authentication state.
@@ -46,6 +46,7 @@ class FiberAuth extends Facade
      * Resolve the facade root instance from the container.
      *
      * @param string $name
+     *
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
@@ -53,7 +54,7 @@ class FiberAuth extends Facade
         // If we're in a Fiber, use the Fiber's container
         if (\Fiber::getCurrent() !== null) {
             $container = app('fiberflow.sandbox')->getCurrentContainer();
-            
+
             if ($container !== null) {
                 return $container->make($name);
             }
@@ -105,4 +106,3 @@ class FiberAuth extends Facade
         }
     }
 }
-

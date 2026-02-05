@@ -7,7 +7,4 @@ namespace FiberFlow\Exceptions;
 /**
  * Exception thrown when a Fiber operation fails.
  */
-class FiberException extends FiberFlowException
-{
-}
-
+class FiberException extends FiberFlowException {}

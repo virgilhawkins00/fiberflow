@@ -107,4 +107,3 @@ test('it can wait for all fibers to complete', function () {
     expect($completed)->toBe(3);
     expect($manager->getActiveCount())->toBe(0);
 });
-

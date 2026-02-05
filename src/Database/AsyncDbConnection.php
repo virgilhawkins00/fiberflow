@@ -24,9 +24,8 @@ class AsyncDbConnection
      * Create a new async database connection.
      */
     public function __construct(
-        protected array $config
-    ) {
-    }
+        protected array $config,
+    ) {}
 
     /**
      * Get or create the connection pool.
@@ -41,8 +40,8 @@ class AsyncDbConnection
                     $this->config['port'] ?? 3306,
                     $this->config['username'] ?? 'root',
                     $this->config['password'] ?? '',
-                    $this->config['database'] ?? 'test'
-                )
+                    $this->config['database'] ?? 'test',
+                ),
             );
 
             $this->pool = new MysqlConnectionPool($config, $this->config['pool_size'] ?? 10);
@@ -75,6 +74,7 @@ class AsyncDbConnection
     public function prepare(string $sql): MysqlStatement
     {
         $pool = $this->getPool();
+
         return $pool->prepare($sql);
     }
 
@@ -92,6 +92,7 @@ class AsyncDbConnection
      * Fetch all rows from a query.
      *
      * @param array<int|string, mixed> $params
+     *
      * @return array<int, array<string, mixed>>
      */
     public function fetchAll(string $sql, array $params = []): array
@@ -110,12 +111,13 @@ class AsyncDbConnection
      * Fetch a single row from a query.
      *
      * @param array<int|string, mixed> $params
+     *
      * @return array<string, mixed>|null
      */
     public function fetchOne(string $sql, array $params = []): ?array
     {
         $result = $this->query($sql, $params);
-        
+
         foreach ($result as $row) {
             return $row;
         }
@@ -137,10 +139,11 @@ class AsyncDbConnection
             'INSERT INTO %s (%s) VALUES (%s)',
             $table,
             implode(', ', $columns),
-            implode(', ', $placeholders)
+            implode(', ', $placeholders),
         );
 
         $result = $this->query($sql, array_values($data));
+
         return $result->getLastInsertId();
     }
 
@@ -166,12 +169,12 @@ class AsyncDbConnection
             'UPDATE %s SET %s WHERE %s',
             $table,
             implode(', ', $setClauses),
-            implode(' AND ', $whereClauses)
+            implode(' AND ', $whereClauses),
         );
 
         $params = array_merge(array_values($data), array_values($where));
         $result = $this->query($sql, $params);
-        
+
         return $result->getRowCount();
     }
 
@@ -190,10 +193,11 @@ class AsyncDbConnection
         $sql = sprintf(
             'DELETE FROM %s WHERE %s',
             $table,
-            implode(' AND ', $whereClauses)
+            implode(' AND ', $whereClauses),
         );
 
         $result = $this->query($sql, array_values($where));
+
         return $result->getRowCount();
     }
 
@@ -225,7 +229,9 @@ class AsyncDbConnection
      * Execute a callback within a transaction.
      *
      * @template T
+     *
      * @param callable(): T $callback
+     *
      * @return T
      */
     public function transaction(callable $callback): mixed
@@ -235,6 +241,7 @@ class AsyncDbConnection
         try {
             $result = $callback($this);
             $this->commit();
+
             return $result;
         } catch (\Throwable $e) {
             $this->rollback();
@@ -253,4 +260,3 @@ class AsyncDbConnection
         }
     }
 }
-

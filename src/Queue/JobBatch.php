@@ -60,9 +60,8 @@ class JobBatch
      */
     public function __construct(
         protected string $id,
-        protected string $name = ''
-    ) {
-    }
+        protected string $name = '',
+    ) {}
 
     /**
      * Add a job to the batch.
@@ -70,6 +69,7 @@ class JobBatch
     public function add(Job $job): self
     {
         $this->jobs[] = $job;
+
         return $this;
     }
 
@@ -78,7 +78,7 @@ class JobBatch
      */
     public function markCompleted(string $jobId): void
     {
-        if (!in_array($jobId, $this->completed)) {
+        if (! in_array($jobId, $this->completed)) {
             $this->completed[] = $jobId;
         }
 
@@ -90,7 +90,7 @@ class JobBatch
      */
     public function markFailed(string $jobId): void
     {
-        if (!in_array($jobId, $this->failed)) {
+        if (! in_array($jobId, $this->failed)) {
             $this->failed[] = $jobId;
         }
 
@@ -103,6 +103,7 @@ class JobBatch
     public function then(callable $callback): self
     {
         $this->thenCallbacks[] = $callback;
+
         return $this;
     }
 
@@ -112,6 +113,7 @@ class JobBatch
     public function catch(callable $callback): self
     {
         $this->catchCallbacks[] = $callback;
+
         return $this;
     }
 
@@ -121,6 +123,7 @@ class JobBatch
     public function finally(callable $callback): self
     {
         $this->finallyCallbacks[] = $callback;
+
         return $this;
     }
 
@@ -129,7 +132,7 @@ class JobBatch
      */
     protected function checkCompletion(): void
     {
-        if (!$this->isFinished()) {
+        if (! $this->isFinished()) {
             return;
         }
 
@@ -163,7 +166,7 @@ class JobBatch
      */
     public function hasFailures(): bool
     {
-        return !empty($this->failed);
+        return ! empty($this->failed);
     }
 
     /**
@@ -176,6 +179,7 @@ class JobBatch
         }
 
         $processed = count($this->completed) + count($this->failed);
+
         return ($processed / count($this->jobs)) * 100;
     }
 
@@ -229,4 +233,3 @@ class JobBatch
         return count($this->jobs);
     }
 }
-

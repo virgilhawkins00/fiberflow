@@ -29,7 +29,7 @@ class RateLimiter
      */
     public function __construct(
         protected int $maxTokens,
-        protected float $refillRate
+        protected float $refillRate,
     ) {
         $this->tokens = $maxTokens;
         $this->lastRefill = microtime(true);
@@ -39,6 +39,7 @@ class RateLimiter
      * Attempt to consume tokens.
      *
      * @param int $tokens Number of tokens to consume
+     *
      * @return bool True if tokens were consumed, false otherwise
      */
     public function attempt(int $tokens = 1): bool
@@ -47,6 +48,7 @@ class RateLimiter
 
         if ($this->tokens >= $tokens) {
             $this->tokens -= $tokens;
+
             return true;
         }
 
@@ -60,7 +62,7 @@ class RateLimiter
      */
     public function wait(int $tokens = 1): void
     {
-        while (!$this->attempt($tokens)) {
+        while (! $this->attempt($tokens)) {
             // Calculate wait time
             $tokensNeeded = $tokens - $this->tokens;
             $waitTime = $tokensNeeded / $this->refillRate;
@@ -91,6 +93,7 @@ class RateLimiter
     public function getTokens(): float
     {
         $this->refill();
+
         return $this->tokens;
     }
 
@@ -131,7 +134,7 @@ class RateLimiter
         }
 
         $tokensNeeded = $tokens - $this->tokens;
+
         return $tokensNeeded / $this->refillRate;
     }
 }
-

@@ -8,7 +8,7 @@ use FiberFlow\Coroutine\FiberContext;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Fiber-aware Cache Facade
+ * Fiber-aware Cache Facade.
  *
  * Provides caching functionality with Fiber isolation.
  * Each Fiber can maintain its own cache namespace.
@@ -45,6 +45,7 @@ class FiberCache extends Facade
      * Resolve the facade root instance from the container.
      *
      * @param string $name
+     *
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
@@ -52,7 +53,7 @@ class FiberCache extends Facade
         // If we're in a Fiber, use the Fiber's container
         if (\Fiber::getCurrent() !== null) {
             $container = app('fiberflow.sandbox')->getCurrentContainer();
-            
+
             if ($container !== null) {
                 return $container->make($name);
             }
@@ -68,14 +69,14 @@ class FiberCache extends Facade
     public static function fiberKey(string $key): string
     {
         $fiber = \Fiber::getCurrent();
-        
+
         if ($fiber === null) {
             return $key;
         }
 
         // Use Fiber object hash as unique identifier
         $fiberId = spl_object_hash($fiber);
-        
+
         return "fiber:{$fiberId}:{$key}";
     }
 
@@ -117,18 +118,18 @@ class FiberCache extends Facade
     public static function flushFiberCache(): bool
     {
         $fiber = \Fiber::getCurrent();
-        
+
         if ($fiber === null) {
             return false;
         }
 
         $fiberId = spl_object_hash($fiber);
         $prefix = "fiber:{$fiberId}:";
-        
+
         // This is a simplified implementation
         // In production, you'd need to iterate through keys with the prefix
         FiberContext::set('cache.flushed', true);
-        
+
         return true;
     }
 
@@ -156,4 +157,3 @@ class FiberCache extends Facade
         return FiberContext::has("cache.context.{$key}");
     }
 }
-

@@ -29,7 +29,7 @@ class PriorityQueue
      */
     public function __construct()
     {
-        $this->queue = new SplPriorityQueue();
+        $this->queue = new SplPriorityQueue;
     }
 
     /**
@@ -77,8 +77,7 @@ class PriorityQueue
      */
     public function clear(): void
     {
-        $this->queue = new SplPriorityQueue();
+        $this->queue = new SplPriorityQueue;
         $this->counter = 0;
     }
 }
-

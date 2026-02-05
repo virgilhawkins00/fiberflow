@@ -25,7 +25,7 @@ class ErrorHandler
      * Create a new error handler instance.
      */
     public function __construct(
-        protected ?MetricsCollector $metrics = null
+        protected ?MetricsCollector $metrics = null,
     ) {
         $this->registerDefaultHandlers();
     }
@@ -78,6 +78,7 @@ class ErrorHandler
         // Try to find a specific handler
         if (isset($this->handlers[$exceptionClass])) {
             $this->handlers[$exceptionClass]($exception);
+
             return;
         }
 
@@ -85,6 +86,7 @@ class ErrorHandler
         foreach ($this->handlers as $class => $handler) {
             if ($exception instanceof $class) {
                 $handler($exception);
+
                 return;
             }
         }
@@ -108,7 +110,9 @@ class ErrorHandler
      * Wrap a callable with error handling.
      *
      * @template T
+     *
      * @param callable(): T $callback
+     *
      * @return T|null
      */
     public function wrap(callable $callback): mixed
@@ -117,6 +121,7 @@ class ErrorHandler
             return $callback();
         } catch (Throwable $e) {
             $this->handle($e);
+
             return null;
         }
     }
@@ -147,4 +152,3 @@ class ErrorHandler
         return $this->handlers;
     }
 }
-

@@ -54,7 +54,7 @@ class RabbitMqQueueDriver implements AsyncQueueDriver
                 $this->config['port'] ?? 5672,
                 $this->config['user'] ?? 'guest',
                 $this->config['password'] ?? 'guest',
-                $this->config['vhost'] ?? '/'
+                $this->config['vhost'] ?? '/',
             );
         }
 
@@ -122,7 +122,7 @@ class RabbitMqQueueDriver implements AsyncQueueDriver
             $message->getBody(),
             '',
             $queue,
-            $message->getDeliveryTag()
+            $message->getDeliveryTag(),
         );
     }
 
@@ -203,4 +203,3 @@ class RabbitMqQueueDriver implements AsyncQueueDriver
         }
     }
 }
-

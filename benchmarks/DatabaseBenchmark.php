@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use FiberFlow\Database\AsyncDbConnection;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
  * This benchmark demonstrates the performance benefits of async database
  * operations when processing multiple queries concurrently.
  */
-
 echo "=== FiberFlow Database Benchmark ===\n\n";
 
 // Configuration
@@ -37,7 +36,7 @@ echo "- Pool Size: {$config['pool_size']}\n\n";
 // ============================================================================
 
 echo "1. Traditional Laravel DB (Sequential)\n";
-echo str_repeat('-', 50) . "\n";
+echo str_repeat('-', 50)."\n";
 
 $startTime = microtime(true);
 $startMemory = memory_get_usage(true);
@@ -52,9 +51,9 @@ try {
     $memoryUsed = memory_get_usage(true) - $startMemory;
 
     echo "✓ Completed\n";
-    echo "  Duration: " . round($duration, 2) . "s\n";
-    echo "  Memory: " . formatBytes($memoryUsed) . "\n";
-    echo "  Throughput: " . round($queryCount / $duration, 2) . " queries/s\n\n";
+    echo '  Duration: '.round($duration, 2)."s\n";
+    echo '  Memory: '.formatBytes($memoryUsed)."\n";
+    echo '  Throughput: '.round($queryCount / $duration, 2)." queries/s\n\n";
 } catch (\Throwable $e) {
     echo "✗ Error: {$e->getMessage()}\n\n";
 }
@@ -64,7 +63,7 @@ try {
 // ============================================================================
 
 echo "2. FiberFlow AsyncDb (Concurrent)\n";
-echo str_repeat('-', 50) . "\n";
+echo str_repeat('-', 50)."\n";
 
 $startTime = microtime(true);
 $startMemory = memory_get_usage(true);
@@ -87,10 +86,10 @@ try {
 
     // Wait for all to complete
     $allDone = false;
-    while (!$allDone) {
+    while (! $allDone) {
         $allDone = true;
         foreach ($fibers as $fiber) {
-            if (!$fiber->isTerminated()) {
+            if (! $fiber->isTerminated()) {
                 $allDone = false;
                 if ($fiber->isSuspended()) {
                     $fiber->resume();
@@ -106,9 +105,9 @@ try {
     $memoryUsed = memory_get_usage(true) - $startMemory;
 
     echo "✓ Completed\n";
-    echo "  Duration: " . round($duration, 2) . "s\n";
-    echo "  Memory: " . formatBytes($memoryUsed) . "\n";
-    echo "  Throughput: " . round($queryCount / $duration, 2) . " queries/s\n\n";
+    echo '  Duration: '.round($duration, 2)."s\n";
+    echo '  Memory: '.formatBytes($memoryUsed)."\n";
+    echo '  Throughput: '.round($queryCount / $duration, 2)." queries/s\n\n";
 } catch (\Throwable $e) {
     echo "✗ Error: {$e->getMessage()}\n\n";
 }
@@ -132,6 +131,5 @@ function formatBytes(int $bytes): string
     $pow = min($pow, count($units) - 1);
     $bytes /= (1 << (10 * $pow));
 
-    return round($bytes, 2) . ' ' . $units[$pow];
+    return round($bytes, 2).' '.$units[$pow];
 }
-

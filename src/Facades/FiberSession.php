@@ -8,7 +8,7 @@ use FiberFlow\Coroutine\FiberContext;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Fiber-aware Session Facade
+ * Fiber-aware Session Facade.
  *
  * Provides session functionality with Fiber isolation.
  * Each Fiber maintains its own session state.
@@ -47,6 +47,7 @@ class FiberSession extends Facade
      * Resolve the facade root instance from the container.
      *
      * @param string $name
+     *
      * @return mixed
      */
     protected static function resolveFacadeInstance($name)
@@ -54,7 +55,7 @@ class FiberSession extends Facade
         // If we're in a Fiber, use the Fiber's container
         if (\Fiber::getCurrent() !== null) {
             $container = app('fiberflow.sandbox')->getCurrentContainer();
-            
+
             if ($container !== null) {
                 return $container->make($name);
             }
@@ -120,14 +121,14 @@ class FiberSession extends Facade
         if (\Fiber::getCurrent() !== null) {
             $all = FiberContext::all();
             $sessionData = [];
-            
+
             foreach ($all as $key => $value) {
                 if (str_starts_with($key, 'session.')) {
                     $sessionKey = substr($key, 8); // Remove 'session.' prefix
                     $sessionData[$sessionKey] = $value;
                 }
             }
-            
+
             return $sessionData;
         }
 
@@ -153,7 +154,7 @@ class FiberSession extends Facade
     {
         if (\Fiber::getCurrent() !== null) {
             $all = FiberContext::all();
-            
+
             foreach ($all as $key => $value) {
                 if (str_starts_with($key, 'session.')) {
                     FiberContext::forget($key);
@@ -162,4 +163,3 @@ class FiberSession extends Facade
         }
     }
 }
-

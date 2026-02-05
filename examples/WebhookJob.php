@@ -30,9 +30,8 @@ class WebhookJob implements ShouldQueue
     public function __construct(
         public string $url,
         public array $payload,
-        public int $retries = 3
-    ) {
-    }
+        public int $retries = 3,
+    ) {}
 
     /**
      * Execute the job.
@@ -95,4 +94,3 @@ class WebhookJob implements ShouldQueue
         return ['webhook', parse_url($this->url, PHP_URL_HOST)];
     }
 }
-

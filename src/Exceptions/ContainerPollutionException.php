@@ -7,7 +7,4 @@ namespace FiberFlow\Exceptions;
 /**
  * Exception thrown when container pollution is detected.
  */
-class ContainerPollutionException extends FiberFlowException
-{
-}
-
+class ContainerPollutionException extends FiberFlowException {}

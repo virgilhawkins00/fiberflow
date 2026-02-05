@@ -48,7 +48,7 @@ class ContainerPollutionDetector
      */
     public function __construct()
     {
-        $this->snapshots = new \WeakMap();
+        $this->snapshots = new \WeakMap;
         $this->enabled = config('fiberflow.pollution_detection.enabled', true);
     }
 
@@ -57,7 +57,7 @@ class ContainerPollutionDetector
      */
     public function takeSnapshot(Container $container): void
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return;
         }
 
@@ -86,7 +86,7 @@ class ContainerPollutionDetector
      */
     public function verify(Container $container): void
     {
-        if (!$this->enabled) {
+        if (! $this->enabled) {
             return;
         }
 
@@ -96,7 +96,7 @@ class ContainerPollutionDetector
             return;
         }
 
-        if (!isset($this->snapshots[$fiber])) {
+        if (! isset($this->snapshots[$fiber])) {
             return;
         }
 
@@ -104,14 +104,14 @@ class ContainerPollutionDetector
         $violations = [];
 
         foreach ($this->isolatedServices as $service) {
-            if (!$container->bound($service)) {
+            if (! $container->bound($service)) {
                 continue;
             }
 
             $instance = $container->make($service);
             $currentState = $this->captureState($instance);
 
-            if (!isset($originalSnapshot[$service])) {
+            if (! isset($originalSnapshot[$service])) {
                 continue;
             }
 
@@ -126,9 +126,9 @@ class ContainerPollutionDetector
             }
         }
 
-        if (!empty($violations)) {
+        if (! empty($violations)) {
             throw new ContainerPollutionException(
-                'Container pollution detected: ' . json_encode($violations)
+                'Container pollution detected: '.json_encode($violations),
             );
         }
     }
@@ -191,7 +191,7 @@ class ContainerPollutionDetector
         // Compare properties
         if (isset($original['properties']) && isset($current['properties'])) {
             foreach ($original['properties'] as $key => $value) {
-                if (!isset($current['properties'][$key])) {
+                if (! isset($current['properties'][$key])) {
                     return true;
                 }
 
@@ -209,7 +209,7 @@ class ContainerPollutionDetector
      */
     public function addIsolatedService(string $service): void
     {
-        if (!in_array($service, $this->isolatedServices, true)) {
+        if (! in_array($service, $this->isolatedServices, true)) {
             $this->isolatedServices[] = $service;
         }
     }
@@ -230,4 +230,3 @@ class ContainerPollutionDetector
         return $this->enabled;
     }
 }
-

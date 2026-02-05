@@ -25,9 +25,8 @@ class DatabaseJob implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        protected int $userId
-    ) {
-    }
+        protected int $userId,
+    ) {}
 
     /**
      * Execute the job.
@@ -41,13 +40,14 @@ class DatabaseJob implements ShouldQueue
 
         if ($user === null) {
             $this->fail(new \RuntimeException("User {$this->userId} not found"));
+
             return;
         }
 
         // Example 2: Raw query
         $orders = AsyncDb::fetchAll(
             'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 10',
-            [$this->userId]
+            [$this->userId],
         );
 
         // Example 3: Insert
@@ -77,7 +77,7 @@ class DatabaseJob implements ShouldQueue
             LEFT JOIN orders o ON o.user_id = u.id
             WHERE u.id = ?
             GROUP BY u.id, u.name',
-            [$this->userId]
+            [$this->userId],
         );
 
         // Log the results
@@ -97,7 +97,6 @@ class DatabaseJob implements ShouldQueue
      */
     public function tags(): array
     {
-        return ['database', 'user:' . $this->userId];
+        return ['database', 'user:'.$this->userId];
     }
 }
-

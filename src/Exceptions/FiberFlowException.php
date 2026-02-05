@@ -9,7 +9,4 @@ use Exception;
 /**
  * Base exception for all FiberFlow exceptions.
  */
-class FiberFlowException extends Exception
-{
-}
-
+class FiberFlowException extends Exception {}

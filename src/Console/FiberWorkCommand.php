@@ -6,7 +6,6 @@ namespace FiberFlow\Console;
 
 use FiberFlow\Loop\FiberLoop;
 use FiberFlow\Metrics\MetricsCollector;
-use FiberFlow\Console\DashboardRenderer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -59,7 +58,7 @@ class FiberWorkCommand extends Command
         $this->info("Memory limit: {$this->option('memory')}MB");
 
         if ($dashboardEnabled) {
-            $this->info("Dashboard: ENABLED");
+            $this->info('Dashboard: ENABLED');
         }
 
         $this->newLine();
@@ -73,7 +72,7 @@ class FiberWorkCommand extends Command
             $loop->run(
                 connection: $connection,
                 queue: $queue,
-                options: $this->gatherWorkerOptions()
+                options: $this->gatherWorkerOptions(),
             );
         } catch (\Throwable $e) {
             $this->error("Worker failed: {$e->getMessage()}");
@@ -143,4 +142,3 @@ class FiberWorkCommand extends Command
         ];
     }
 }
-

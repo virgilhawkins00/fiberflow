@@ -150,6 +150,7 @@ class InteractiveControls
         }
 
         $this->pause();
+
         return 'Worker paused. Press "r" to resume.';
     }
 
@@ -158,11 +159,12 @@ class InteractiveControls
      */
     protected function handleResume(): string
     {
-        if (!$this->isPaused()) {
+        if (! $this->isPaused()) {
             return 'Worker is already running';
         }
 
         $this->resume();
+
         return 'Worker resumed';
     }
 
@@ -172,6 +174,7 @@ class InteractiveControls
     protected function handleStop(): string
     {
         $this->stop();
+
         return 'Stopping worker gracefully...';
     }
 
@@ -190,4 +193,3 @@ class InteractiveControls
         return $help;
     }
 }
-

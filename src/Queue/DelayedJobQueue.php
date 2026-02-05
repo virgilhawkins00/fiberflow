@@ -34,7 +34,7 @@ class DelayedJobQueue
         ];
 
         // Sort by availableAt for efficient polling
-        usort($this->jobs, fn($a, $b) => $a['availableAt'] <=> $b['availableAt']);
+        usort($this->jobs, fn ($a, $b) => $a['availableAt'] <=> $b['availableAt']);
     }
 
     /**
@@ -69,6 +69,7 @@ class DelayedJobQueue
     public function getNextJob(): ?Job
     {
         $ready = $this->getReadyJobs();
+
         return $ready[0] ?? null;
     }
 
@@ -121,4 +122,3 @@ class DelayedJobQueue
         return $this->jobs;
     }
 }
-

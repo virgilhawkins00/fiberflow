@@ -7,7 +7,6 @@ namespace FiberFlow;
 use FiberFlow\Console\FiberWorkCommand;
 use FiberFlow\Coroutine\SandboxManager;
 use FiberFlow\Database\AsyncDbConnection;
-use FiberFlow\Facades\AsyncHttp;
 use FiberFlow\Loop\ConcurrencyManager;
 use FiberFlow\Loop\FiberLoop;
 use FiberFlow\Metrics\MetricsCollector;
@@ -22,7 +21,7 @@ class FiberFlowServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(
             __DIR__.'/../config/fiberflow.php',
-            'fiberflow'
+            'fiberflow',
         );
 
         $this->registerCoreServices();
@@ -56,19 +55,19 @@ class FiberFlowServiceProvider extends ServiceProvider
 
         $this->app->singleton(ConcurrencyManager::class, function ($app) {
             return new ConcurrencyManager(
-                maxConcurrency: config('fiberflow.max_concurrency', 50)
+                maxConcurrency: config('fiberflow.max_concurrency', 50),
             );
         });
 
         $this->app->singleton(FiberLoop::class, function ($app) {
             return new FiberLoop(
                 $app->make(ConcurrencyManager::class),
-                $app->make(SandboxManager::class)
+                $app->make(SandboxManager::class),
             );
         });
 
         $this->app->singleton(MetricsCollector::class, function ($app) {
-            return new MetricsCollector();
+            return new MetricsCollector;
         });
     }
 
@@ -81,7 +80,7 @@ class FiberFlowServiceProvider extends ServiceProvider
             return new \FiberFlow\Http\AsyncHttpClient(
                 timeout: config('fiberflow.http.timeout', 30),
                 retryAttempts: config('fiberflow.http.retry_attempts', 3),
-                retryDelay: config('fiberflow.http.retry_delay', 1000)
+                retryDelay: config('fiberflow.http.retry_delay', 1000),
             );
         });
 
@@ -124,4 +123,3 @@ class FiberFlowServiceProvider extends ServiceProvider
         ];
     }
 }
-

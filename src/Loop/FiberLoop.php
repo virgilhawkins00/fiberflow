@@ -40,7 +40,7 @@ class FiberLoop
         protected SandboxManager $sandbox,
         protected ?ErrorHandler $errorHandler = null,
         protected ?FiberRecoveryManager $recoveryManager = null,
-        protected ?MetricsCollector $metrics = null
+        protected ?MetricsCollector $metrics = null,
     ) {
         $this->errorHandler = $errorHandler ?? new ErrorHandler($metrics);
         $this->recoveryManager = $recoveryManager ?? new FiberRecoveryManager($this->errorHandler, $metrics);
@@ -62,6 +62,7 @@ class FiberLoop
             if ($this->shouldQuit) {
                 EventLoop::cancel($callbackId);
                 $this->shutdown();
+
                 return;
             }
 
@@ -84,6 +85,7 @@ class FiberLoop
 
         if ($job === null) {
             usleep((int) ($options->sleep * 1000000));
+
             return;
         }
 
@@ -217,7 +219,7 @@ class FiberLoop
             stopWhenEmpty: (bool) ($options['stop_when_empty'] ?? false),
             maxJobs: (int) ($options['max_jobs'] ?? 0),
             maxTime: (int) ($options['max_time'] ?? 0),
-            rest: (int) ($options['rest'] ?? 0)
+            rest: (int) ($options['rest'] ?? 0),
         );
     }
 
@@ -283,4 +285,3 @@ class FiberLoop
         ]);
     }
 }
-

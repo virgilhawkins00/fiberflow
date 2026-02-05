@@ -37,7 +37,7 @@ class FiberRecoveryManager
         protected ErrorHandler $errorHandler,
         protected ?MetricsCollector $metrics = null,
         ?int $maxRetries = null,
-        ?int $retryDelay = null
+        ?int $retryDelay = null,
     ) {
         $this->maxRetries = $maxRetries ?? config('fiberflow.error_handling.max_retries', 3);
         $this->retryDelay = $retryDelay ?? config('fiberflow.error_handling.retry_delay', 1);
@@ -66,6 +66,7 @@ class FiberRecoveryManager
             ]);
 
             $this->markJobAsFailed($jobId);
+
             return false;
         }
 
@@ -102,7 +103,7 @@ class FiberRecoveryManager
      */
     protected function incrementAttempts(string $jobId): void
     {
-        if (!isset($this->failedJobs[$jobId])) {
+        if (! isset($this->failedJobs[$jobId])) {
             $this->failedJobs[$jobId] = 0;
         }
 
@@ -166,4 +167,3 @@ class FiberRecoveryManager
         $this->failedJobs = [];
     }
 }
-

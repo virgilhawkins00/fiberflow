@@ -45,9 +45,8 @@ class AsyncQueryBuilder
      */
     public function __construct(
         protected AsyncDbConnection $connection,
-        protected string $table
-    ) {
-    }
+        protected string $table,
+    ) {}
 
     /**
      * Set the columns to select.
@@ -55,6 +54,7 @@ class AsyncQueryBuilder
     public function select(string ...$columns): self
     {
         $this->selects = $columns;
+
         return $this;
     }
 
@@ -97,6 +97,7 @@ class AsyncQueryBuilder
     public function limit(int $limit): self
     {
         $this->limit = $limit;
+
         return $this;
     }
 
@@ -106,6 +107,7 @@ class AsyncQueryBuilder
     public function offset(int $offset): self
     {
         $this->offset = $offset;
+
         return $this;
     }
 
@@ -117,6 +119,7 @@ class AsyncQueryBuilder
     public function get(): array
     {
         [$sql, $params] = $this->toSql();
+
         return $this->connection->fetchAll($sql, $params);
     }
 
@@ -129,6 +132,7 @@ class AsyncQueryBuilder
     {
         $this->limit(1);
         [$sql, $params] = $this->toSql();
+
         return $this->connection->fetchOne($sql, $params);
     }
 
@@ -150,6 +154,7 @@ class AsyncQueryBuilder
     public function update(array $data): int
     {
         $where = $this->buildWhereArray();
+
         return $this->connection->update($this->table, $data, $where);
     }
 
@@ -159,6 +164,7 @@ class AsyncQueryBuilder
     public function delete(): int
     {
         $where = $this->buildWhereArray();
+
         return $this->connection->delete($this->table, $where);
     }
 
@@ -173,22 +179,22 @@ class AsyncQueryBuilder
         $params = [];
 
         // Add WHERE clauses
-        if (!empty($this->wheres)) {
+        if (! empty($this->wheres)) {
             $whereClauses = [];
             foreach ($this->wheres as $where) {
                 $whereClauses[] = "{$where['column']} {$where['operator']} ?";
                 $params[] = $where['value'];
             }
-            $sql .= ' WHERE ' . implode(' AND ', $whereClauses);
+            $sql .= ' WHERE '.implode(' AND ', $whereClauses);
         }
 
         // Add ORDER BY
-        if (!empty($this->orders)) {
+        if (! empty($this->orders)) {
             $orderClauses = [];
             foreach ($this->orders as $order) {
                 $orderClauses[] = "{$order['column']} {$order['direction']}";
             }
-            $sql .= ' ORDER BY ' . implode(', ', $orderClauses);
+            $sql .= ' ORDER BY '.implode(', ', $orderClauses);
         }
 
         // Add LIMIT
@@ -217,7 +223,7 @@ class AsyncQueryBuilder
                 $where[$clause['column']] = $clause['value'];
             }
         }
+
         return $where;
     }
 }
-

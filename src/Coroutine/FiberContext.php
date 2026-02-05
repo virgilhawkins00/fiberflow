@@ -24,15 +24,13 @@ class FiberContext
      */
     protected static function initialize(): void
     {
-        if (!isset(self::$contexts)) {
-            self::$contexts = new WeakMap();
+        if (! isset(self::$contexts)) {
+            self::$contexts = new WeakMap;
         }
     }
 
     /**
      * Set a value in the current Fiber's context.
-     *
-     * @param mixed $value
      */
     public static function set(string $key, mixed $value): void
     {
@@ -44,7 +42,7 @@ class FiberContext
             return;
         }
 
-        if (!isset(self::$contexts[$fiber])) {
+        if (! isset(self::$contexts[$fiber])) {
             self::$contexts[$fiber] = [];
         }
 
@@ -53,9 +51,6 @@ class FiberContext
 
     /**
      * Get a value from the current Fiber's context.
-     *
-     * @param mixed $default
-     * @return mixed
      */
     public static function get(string $key, mixed $default = null): mixed
     {
@@ -144,4 +139,3 @@ class FiberContext
         }
     }
 }
-

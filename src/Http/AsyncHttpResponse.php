@@ -12,9 +12,8 @@ class AsyncHttpResponse
      * Create a new async HTTP response instance.
      */
     public function __construct(
-        protected Response $response
-    ) {
-    }
+        protected Response $response,
+    ) {}
 
     /**
      * Get the response status code.
@@ -108,4 +107,3 @@ class AsyncHttpResponse
         return $this->response;
     }
 }
-

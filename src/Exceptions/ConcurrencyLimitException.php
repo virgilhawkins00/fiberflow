@@ -7,7 +7,4 @@ namespace FiberFlow\Exceptions;
 /**
  * Exception thrown when the concurrency limit is reached.
  */
-class ConcurrencyLimitException extends FiberFlowException
-{
-}
-
+class ConcurrencyLimitException extends FiberFlowException {}

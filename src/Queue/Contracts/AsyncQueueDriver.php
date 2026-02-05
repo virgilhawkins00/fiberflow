@@ -19,6 +19,7 @@ interface AsyncQueueDriver
      * @param string $queue Queue name
      * @param string $payload Serialized job payload
      * @param int $delay Delay in seconds (0 for immediate)
+     *
      * @return string|null Job ID
      */
     public function push(string $queue, string $payload, int $delay = 0): ?string;
@@ -27,7 +28,6 @@ interface AsyncQueueDriver
      * Pop the next job from the queue.
      *
      * @param string $queue Queue name
-     * @return Job|null
      */
     public function pop(string $queue): ?Job;
 
@@ -52,6 +52,7 @@ interface AsyncQueueDriver
      * Get the size of the queue.
      *
      * @param string $queue Queue name
+     *
      * @return int Number of jobs in queue
      */
     public function size(string $queue): int;
@@ -78,4 +79,3 @@ interface AsyncQueueDriver
      */
     public function close(): void;
 }
-

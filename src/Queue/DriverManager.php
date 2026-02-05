@@ -67,13 +67,13 @@ class DriverManager
      */
     public function driver(string $name, array $config = []): AsyncQueueDriver
     {
-        $key = $name . '_' . md5(serialize($config));
+        $key = $name.'_'.md5(serialize($config));
 
         if (isset($this->instances[$key])) {
             return $this->instances[$key];
         }
 
-        if (!isset($this->drivers[$name])) {
+        if (! isset($this->drivers[$name])) {
             throw new \InvalidArgumentException("Queue driver [{$name}] not registered.");
         }
 
@@ -124,4 +124,3 @@ class DriverManager
         $this->drivers[$name] = $callback;
     }
 }
-

@@ -23,7 +23,7 @@ class AsyncHttpClient
     public function __construct(
         protected int $timeout = 30,
         protected int $retryAttempts = 3,
-        protected int $retryDelay = 1000
+        protected int $retryDelay = 1000,
     ) {
         $this->client = HttpClientBuilder::buildDefault();
     }
@@ -215,4 +215,3 @@ class AsyncHttpClient
         return new AsyncHttpResponse($response);
     }
 }
-

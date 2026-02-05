@@ -72,7 +72,7 @@ class QueueConcurrencyManager
      */
     public function increment(string $queue): void
     {
-        if (!isset($this->activeJobs[$queue])) {
+        if (! isset($this->activeJobs[$queue])) {
             $this->activeJobs[$queue] = 0;
         }
 
@@ -144,4 +144,3 @@ class QueueConcurrencyManager
         unset($this->activeJobs[$queue]);
     }
 }
-

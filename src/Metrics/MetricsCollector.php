@@ -70,7 +70,7 @@ class MetricsCollector
      */
     public function increment(string $category, string $metric, int $amount = 1): void
     {
-        if (!isset($this->metrics[$category][$metric])) {
+        if (! isset($this->metrics[$category][$metric])) {
             $this->metrics[$category][$metric] = 0;
         }
 
@@ -82,7 +82,7 @@ class MetricsCollector
      */
     public function set(string $category, string $metric, mixed $value): void
     {
-        if (!isset($this->metrics[$category])) {
+        if (! isset($this->metrics[$category])) {
             $this->metrics[$category] = [];
         }
 
@@ -218,4 +218,3 @@ class MetricsCollector
         $this->initializeMetrics();
     }
 }
-

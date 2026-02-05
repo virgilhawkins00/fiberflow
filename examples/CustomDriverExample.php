@@ -40,11 +40,11 @@ class InMemoryQueueDriver implements AsyncQueueDriver
      */
     public function push(string $queue, string $payload, int $delay = 0): ?string
     {
-        if (!isset($this->queues[$queue])) {
+        if (! isset($this->queues[$queue])) {
             $this->queues[$queue] = [];
         }
 
-        $jobId = 'job_' . $this->counter++;
+        $jobId = 'job_'.$this->counter++;
         $availableAt = time() + $delay;
 
         $this->queues[$queue][] = [
@@ -61,7 +61,7 @@ class InMemoryQueueDriver implements AsyncQueueDriver
      */
     public function pop(string $queue): ?Job
     {
-        if (!isset($this->queues[$queue]) || empty($this->queues[$queue])) {
+        if (! isset($this->queues[$queue]) || empty($this->queues[$queue])) {
             return null;
         }
 
@@ -73,24 +73,65 @@ class InMemoryQueueDriver implements AsyncQueueDriver
                 $this->queues[$queue] = array_values($this->queues[$queue]);
 
                 // Create a simple job wrapper
-                return new class($job['payload'], $job['id']) implements Job {
+                return new class($job['payload'], $job['id']) implements Job
+                {
                     public function __construct(
                         protected string $payload,
-                        protected string $jobId
+                        protected string $jobId,
                     ) {}
 
-                    public function fire() { /* Process job */ }
+                    public function fire()
+                    { /* Process job */
+                    }
+
                     public function delete() {}
+
                     public function release($delay = 0) {}
-                    public function attempts() { return 1; }
-                    public function getJobId() { return $this->jobId; }
-                    public function getRawBody() { return $this->payload; }
-                    public function getName() { return 'InMemoryJob'; }
-                    public function getConnectionName() { return 'memory'; }
-                    public function getQueue() { return 'default'; }
-                    public function isDeleted() { return false; }
-                    public function isReleased() { return false; }
-                    public function isDeletedOrReleased() { return false; }
+
+                    public function attempts()
+                    {
+                        return 1;
+                    }
+
+                    public function getJobId()
+                    {
+                        return $this->jobId;
+                    }
+
+                    public function getRawBody()
+                    {
+                        return $this->payload;
+                    }
+
+                    public function getName()
+                    {
+                        return 'InMemoryJob';
+                    }
+
+                    public function getConnectionName()
+                    {
+                        return 'memory';
+                    }
+
+                    public function getQueue()
+                    {
+                        return 'default';
+                    }
+
+                    public function isDeleted()
+                    {
+                        return false;
+                    }
+
+                    public function isReleased()
+                    {
+                        return false;
+                    }
+
+                    public function isDeletedOrReleased()
+                    {
+                        return false;
+                    }
                 };
             }
         }
@@ -103,7 +144,7 @@ class InMemoryQueueDriver implements AsyncQueueDriver
      */
     public function delete(string $queue, string $jobId): void
     {
-        if (!isset($this->queues[$queue])) {
+        if (! isset($this->queues[$queue])) {
             return;
         }
 
@@ -122,7 +163,7 @@ class InMemoryQueueDriver implements AsyncQueueDriver
     public function release(string $queue, string $jobId, int $delay = 0): void
     {
         // For in-memory, we just update the availableAt time
-        if (!isset($this->queues[$queue])) {
+        if (! isset($this->queues[$queue])) {
             return;
         }
 
@@ -181,7 +222,7 @@ class InMemoryQueueDriver implements AsyncQueueDriver
 
 function customDriverExample(): void
 {
-    $manager = new DriverManager();
+    $manager = new DriverManager;
 
     // Register custom driver
     $manager->register('memory', InMemoryQueueDriver::class);
@@ -214,4 +255,3 @@ function customDriverExample(): void
 if (php_sapi_name() === 'cli') {
     customDriverExample();
 }
-

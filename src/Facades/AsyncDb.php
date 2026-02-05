@@ -39,4 +39,3 @@ class AsyncDb extends Facade
         return new AsyncQueryBuilder(static::getFacadeRoot(), $table);
     }
 }
-

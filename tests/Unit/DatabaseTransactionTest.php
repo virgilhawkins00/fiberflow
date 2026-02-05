@@ -73,4 +73,3 @@ test('it rolls back transaction on exception', function () {
         expect($e->getMessage())->toBe('Test error');
     }
 });
-

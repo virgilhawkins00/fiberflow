@@ -6,7 +6,7 @@ use FiberFlow\Http\AsyncHttpClient;
 use FiberFlow\Http\AsyncHttpResponse;
 
 test('it can make a GET request', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
 
     $response = $client->get('https://httpbin.org/get');
 
@@ -16,7 +16,7 @@ test('it can make a GET request', function () {
 });
 
 test('it can make a POST request', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
 
     $response = $client->post('https://httpbin.org/post', [
         'name' => 'FiberFlow',
@@ -30,7 +30,7 @@ test('it can make a POST request', function () {
 });
 
 test('it can make concurrent requests in fibers', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
     $results = [];
     $startTime = microtime(true);
 
@@ -54,7 +54,7 @@ test('it can make concurrent requests in fibers', function () {
     }
 
     // Wait for all to complete
-    while (count(array_filter($fibers, fn($f) => !$f->isTerminated())) > 0) {
+    while (count(array_filter($fibers, fn ($f) => ! $f->isTerminated())) > 0) {
         usleep(10000); // 10ms
     }
 
@@ -70,7 +70,7 @@ test('it retries failed requests', function () {
     $client = new AsyncHttpClient(
         timeout: 5,
         retryAttempts: 3,
-        retryDelay: 100
+        retryDelay: 100,
     );
 
     // This endpoint returns 500 status
@@ -86,12 +86,12 @@ test('it retries failed requests', function () {
 test('it handles timeout correctly', function () {
     $client = new AsyncHttpClient(timeout: 1);
 
-    expect(fn() => $client->get('https://httpbin.org/delay/5'))
+    expect(fn () => $client->get('https://httpbin.org/delay/5'))
         ->toThrow(\Throwable::class);
 })->skip('Requires real HTTP calls');
 
 test('it can parse JSON responses', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
 
     $response = $client->get('https://httpbin.org/json');
 
@@ -102,7 +102,7 @@ test('it can parse JSON responses', function () {
 });
 
 test('it can send custom headers', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
 
     $response = $client->get('https://httpbin.org/headers', [
         'X-Custom-Header' => 'FiberFlow',
@@ -116,7 +116,7 @@ test('it can send custom headers', function () {
 });
 
 test('it detects client errors', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
 
     $response = $client->get('https://httpbin.org/status/404');
 
@@ -126,7 +126,7 @@ test('it detects client errors', function () {
 });
 
 test('it detects server errors', function () {
-    $client = new AsyncHttpClient();
+    $client = new AsyncHttpClient;
 
     $response = $client->get('https://httpbin.org/status/500');
 
@@ -134,4 +134,3 @@ test('it detects server errors', function () {
     expect($response->status())->toBe(500);
     expect($response->failed())->toBeTrue();
 });
-
