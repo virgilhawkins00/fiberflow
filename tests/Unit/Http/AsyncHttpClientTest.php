@@ -187,3 +187,39 @@ it('can call delete method with url', function () {
     expect($reflection->getParameters()[0]->getName())->toBe('url');
     expect($reflection->getParameters()[1]->getName())->toBe('headers');
 });
+
+it('has calculateBackoffDelay method', function () {
+    $reflection = new ReflectionClass($this->client);
+    expect($reflection->hasMethod('calculateBackoffDelay'))->toBeTrue();
+});
+
+it('has requestAsync method', function () {
+    $reflection = new ReflectionClass($this->client);
+    expect($reflection->hasMethod('requestAsync'))->toBeTrue();
+});
+
+it('has requestSync method', function () {
+    $reflection = new ReflectionClass($this->client);
+    expect($reflection->hasMethod('requestSync'))->toBeTrue();
+});
+
+it('calculates exponential backoff delay correctly', function () {
+    $reflection = new ReflectionClass($this->client);
+    $method = $reflection->getMethod('calculateBackoffDelay');
+    $method->setAccessible(true);
+
+    // Test exponential backoff
+    $delay1 = $method->invoke($this->client, 1, 1000);
+    $delay2 = $method->invoke($this->client, 2, 1000);
+    $delay3 = $method->invoke($this->client, 3, 1000);
+
+    // Delay should increase exponentially (with jitter)
+    expect($delay1)->toBeGreaterThanOrEqual(1000);
+    expect($delay1)->toBeLessThanOrEqual(1100); // 1000 + 10% jitter
+
+    expect($delay2)->toBeGreaterThanOrEqual(2000);
+    expect($delay2)->toBeLessThanOrEqual(2200); // 2000 + 10% jitter
+
+    expect($delay3)->toBeGreaterThanOrEqual(4000);
+    expect($delay3)->toBeLessThanOrEqual(4400); // 4000 + 10% jitter
+});

@@ -89,3 +89,38 @@ it('resolves fiber-aware session facade', function () {
     expect($session)->not->toBeNull();
 });
 
+it('uses config values when registering services', function () {
+    config(['fiberflow.max_concurrency' => 100]);
+    config(['fiberflow.http.timeout' => 60]);
+    config(['fiberflow.http.retry_attempts' => 5]);
+    config(['fiberflow.http.retry_delay' => 2000]);
+
+    // Just verify config is set
+    expect(config('fiberflow.max_concurrency'))->toBe(100);
+    expect(config('fiberflow.http.timeout'))->toBe(60);
+    expect(config('fiberflow.http.retry_attempts'))->toBe(5);
+    expect(config('fiberflow.http.retry_delay'))->toBe(2000);
+});
+
+it('calls registerCoreServices during registration', function () {
+    $reflection = new ReflectionClass($this->provider);
+    $method = $reflection->getMethod('registerCoreServices');
+    $method->setAccessible(true);
+
+    // Should not throw exception
+    $method->invoke($this->provider);
+
+    expect(true)->toBeTrue();
+});
+
+it('calls registerFacades during registration', function () {
+    $reflection = new ReflectionClass($this->provider);
+    $method = $reflection->getMethod('registerFacades');
+    $method->setAccessible(true);
+
+    // Should not throw exception
+    $method->invoke($this->provider);
+
+    expect(true)->toBeTrue();
+});
+

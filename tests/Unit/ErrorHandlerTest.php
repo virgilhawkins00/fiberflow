@@ -261,3 +261,36 @@ test('it handles fiber crash exceptions with metrics', function () {
 
     expect(true)->toBeTrue();
 });
+
+test('it uses generic throwable handler as fallback', function () {
+    $handler = new ErrorHandler;
+    $called = false;
+
+    $handler->register(Throwable::class, function ($e) use (&$called) {
+        $called = true;
+    });
+
+    // Create a custom exception that doesn't have a specific handler
+    $handler->handle(new \LogicException('Test exception'));
+
+    expect($called)->toBeTrue();
+});
+
+test('it prioritizes specific handlers over generic throwable handler', function () {
+    $handler = new ErrorHandler;
+    $specificCalled = false;
+    $genericCalled = false;
+
+    $handler->register(Throwable::class, function ($e) use (&$genericCalled) {
+        $genericCalled = true;
+    });
+
+    $handler->register(\RuntimeException::class, function ($e) use (&$specificCalled) {
+        $specificCalled = true;
+    });
+
+    $handler->handle(new \RuntimeException('Test exception'));
+
+    expect($specificCalled)->toBeTrue();
+    expect($genericCalled)->toBeFalse();
+});
