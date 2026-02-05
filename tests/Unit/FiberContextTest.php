@@ -97,3 +97,35 @@ test('it isolates context between fibers', function () {
     expect($value1)->toBe('Alice');
     expect($value2)->toBe('Bob');
 });
+
+test('it returns default when not in fiber context', function () {
+    $value = FiberContext::get('key', 'default');
+    expect($value)->toBe('default');
+});
+
+test('it returns false when checking key outside fiber', function () {
+    expect(FiberContext::has('key'))->toBeFalse();
+});
+
+test('it returns empty array when getting all outside fiber', function () {
+    $all = FiberContext::all();
+    expect($all)->toBe([]);
+});
+
+test('it does nothing when setting outside fiber', function () {
+    FiberContext::set('key', 'value');
+    // Should not throw exception
+    expect(true)->toBeTrue();
+});
+
+test('it does nothing when forgetting outside fiber', function () {
+    FiberContext::forget('key');
+    // Should not throw exception
+    expect(true)->toBeTrue();
+});
+
+test('it does nothing when clearing outside fiber', function () {
+    FiberContext::clear();
+    // Should not throw exception
+    expect(true)->toBeTrue();
+});

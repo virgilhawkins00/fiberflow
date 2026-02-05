@@ -174,3 +174,59 @@ test('it can check if not full', function () {
 
     expect($manager->isFull())->toBeFalse();
 });
+
+test('it can remove a fiber', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+
+    $fiber = $manager->spawn(function () {
+        Fiber::suspend();
+    });
+
+    expect($manager->getActiveCount())->toBe(1);
+
+    $manager->remove($fiber);
+
+    expect($manager->getActiveCount())->toBe(0);
+});
+
+test('it handles removing null fiber gracefully', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+
+    $manager->remove(null);
+
+    expect($manager->getActiveCount())->toBe(0);
+});
+
+test('it can terminate all fibers', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+
+    for ($i = 0; $i < 3; $i++) {
+        $manager->spawn(function () {
+            Fiber::suspend();
+        });
+    }
+
+    expect($manager->getActiveCount())->toBe(3);
+
+    $manager->terminateAll();
+
+    expect($manager->getActiveCount())->toBe(0);
+});
+
+test('it gets active fibers list', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 10);
+
+    $fiber1 = $manager->spawn(function () {
+        Fiber::suspend();
+    });
+
+    $fiber2 = $manager->spawn(function () {
+        Fiber::suspend();
+    });
+
+    $activeFibers = $manager->getActiveFibers();
+
+    expect($activeFibers)->toHaveCount(2);
+    expect($activeFibers)->toContain($fiber1);
+    expect($activeFibers)->toContain($fiber2);
+});

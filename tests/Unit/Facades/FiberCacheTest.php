@@ -126,3 +126,34 @@ it('can store multiple values in context', function () {
 
     $fiber->start();
 });
+
+it('resolves facade accessor correctly', function () {
+    $accessor = (new ReflectionClass(FiberCache::class))
+        ->getMethod('getFacadeAccessor')
+        ->invoke(null);
+
+    expect($accessor)->toBe('fiberflow.cache');
+});
+
+it('can overwrite context values', function () {
+    $fiber = new Fiber(function () {
+        FiberCache::contextPut('key', 'value1');
+        expect(FiberCache::contextGet('key'))->toBe('value1');
+
+        FiberCache::contextPut('key', 'value2');
+        expect(FiberCache::contextGet('key'))->toBe('value2');
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+it('context returns null for missing keys without default', function () {
+    $fiber = new Fiber(function () {
+        $value = FiberCache::contextGet('nonexistent');
+        expect($value)->toBeNull();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
