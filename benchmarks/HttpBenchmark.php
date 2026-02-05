@@ -16,12 +16,13 @@ require __DIR__.'/../vendor/autoload.php';
 
 use FiberFlow\Http\AsyncHttpClient;
 use FiberFlow\Loop\ConcurrencyManager;
+use Revolt\EventLoop;
 
 class HttpBenchmark
 {
-    protected int $numRequests = 50;
+    protected int $numRequests = 100;
 
-    protected string $testUrl = 'https://httpbin.org/delay/1';
+    protected string $testUrl = 'https://httpbin.org/delay/0.2';
 
     public function run(): void
     {
@@ -34,7 +35,7 @@ class HttpBenchmark
         echo "Configuration:\n";
         echo "  - Requests: {$this->numRequests}\n";
         echo "  - URL: {$this->testUrl}\n";
-        echo "  - Each request takes ~1 second\n";
+        echo "  - Each request takes ~0.5 seconds\n";
         echo "\n";
 
         $this->benchmarkTraditional();
@@ -73,28 +74,34 @@ class HttpBenchmark
         echo "Running FiberFlow Concurrent Approach...\n";
 
         $client = new AsyncHttpClient;
-        $concurrency = new ConcurrencyManager(maxConcurrency: 50);
 
         $startTime = microtime(true);
         $startMemory = memory_get_usage(true);
 
         $completed = 0;
-        $fibers = [];
+        $pending = $this->numRequests;
 
+        // Queue all requests to the event loop
         for ($i = 0; $i < $this->numRequests; $i++) {
-            $fiber = new Fiber(function () use ($client, &$completed) {
-                $client->get($this->testUrl);
-                $completed++;
+            EventLoop::queue(function () use ($client, &$completed) {
+                try {
+                    $client->get($this->testUrl);
+                } catch (\Throwable $e) {
+                    echo "  ⚠ Request failed: {$e->getMessage()}\n";
+                } finally {
+                    $completed++;
+                }
             });
-
-            $fibers[] = $fiber;
-            $fiber->start();
         }
 
-        // Wait for all fibers to complete
-        while ($completed < $this->numRequests) {
-            usleep(10000); // 10ms
-        }
+        // Run the event loop until all requests complete
+        $checkInterval = EventLoop::repeat(0.1, function (string $callbackId) use (&$completed) {
+            if ($completed >= $this->numRequests) {
+                EventLoop::cancel($callbackId);
+            }
+        });
+
+        EventLoop::run();
 
         $duration = microtime(true) - $startTime;
         $memoryUsed = memory_get_usage(true) - $startMemory;

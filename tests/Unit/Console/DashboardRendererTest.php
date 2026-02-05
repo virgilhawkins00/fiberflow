@@ -6,7 +6,7 @@ use FiberFlow\Console\DashboardRenderer;
 use FiberFlow\Metrics\MetricsCollector;
 
 beforeEach(function () {
-    $this->metrics = new MetricsCollector();
+    $this->metrics = new MetricsCollector;
     $this->renderer = new DashboardRenderer($this->metrics);
 });
 
@@ -16,10 +16,7 @@ it('initializes with metrics collector', function () {
 
 it('can render dashboard', function () {
     $output = $this->renderer->render();
-    
+
     expect($output)->toBeString();
     expect($output)->toContain('FiberFlow');
 });
-
-
-

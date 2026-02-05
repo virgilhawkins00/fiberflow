@@ -12,16 +12,16 @@ use FiberFlow\Metrics\MetricsCollector;
 beforeEach(function () {
     $this->concurrency = new ConcurrencyManager(10);
     $this->sandbox = new SandboxManager(app());
-    $this->metrics = new MetricsCollector();
+    $this->metrics = new MetricsCollector;
     $this->errorHandler = new ErrorHandler($this->metrics);
     $this->recovery = new FiberRecoveryManager($this->errorHandler, $this->metrics);
-    
+
     $this->loop = new FiberLoop(
         $this->concurrency,
         $this->sandbox,
         $this->errorHandler,
         $this->recovery,
-        $this->metrics
+        $this->metrics,
     );
 });
 
@@ -31,9 +31,6 @@ it('initializes with dependencies', function () {
 
 it('initializes with default error handler and recovery manager', function () {
     $loop = new FiberLoop($this->concurrency, $this->sandbox);
-    
+
     expect($loop)->toBeInstanceOf(FiberLoop::class);
 });
-
-
-

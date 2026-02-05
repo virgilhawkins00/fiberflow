@@ -16,4 +16,3 @@ it('initializes with configuration', function () {
 
     expect($driver)->toBeInstanceOf(SqsQueueDriver::class);
 });
-

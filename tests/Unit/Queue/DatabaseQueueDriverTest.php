@@ -11,4 +11,3 @@ it('initializes with connection', function () {
 
     expect($driver)->toBeInstanceOf(DatabaseQueueDriver::class);
 });
-

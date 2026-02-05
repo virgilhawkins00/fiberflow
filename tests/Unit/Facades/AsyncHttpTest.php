@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use FiberFlow\Facades\AsyncHttp;
-use FiberFlow\Http\AsyncHttpClient;
 
 it('resolves facade accessor', function () {
     $accessor = (new \ReflectionClass(AsyncHttp::class))
@@ -12,6 +11,3 @@ it('resolves facade accessor', function () {
 
     expect($accessor)->toBe('fiberflow.http');
 });
-
-
-

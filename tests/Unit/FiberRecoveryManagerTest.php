@@ -8,14 +8,14 @@ use FiberFlow\Metrics\MetricsCollector;
 use Illuminate\Queue\Jobs\Job;
 
 beforeEach(function () {
-    $this->metrics = new MetricsCollector();
+    $this->metrics = new MetricsCollector;
     $this->errorHandler = new ErrorHandler($this->metrics);
     $this->recovery = new FiberRecoveryManager($this->errorHandler, $this->metrics, 3, 1);
 });
 
 it('initializes with default configuration', function () {
     $recovery = new FiberRecoveryManager($this->errorHandler);
-    
+
     expect($recovery)->toBeInstanceOf(FiberRecoveryManager::class);
 });
 
@@ -104,4 +104,3 @@ it('increments metrics on recovery attempt', function () {
     expect($snapshot)->toHaveKey('metrics');
     expect($snapshot['metrics']['jobs']['retried'])->toBeGreaterThan(0);
 });
-
