@@ -367,3 +367,82 @@ test('it detects missing properties', function () {
 
     expect($changed)->toBeTrue();
 });
+
+test('it skips services not in original snapshot', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    // Bind a service
+    $container->singleton('auth', fn () => new class
+    {
+        public string $user = 'test';
+    });
+
+    $fiber = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+
+        // Add a new service after snapshot
+        $container->singleton('new.service', fn () => new stdClass);
+
+        // Verify should not throw because new.service wasn't in original snapshot
+        $detector->verify($container);
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+
+    expect(true)->toBeTrue();
+});
+
+test('it verifies container without throwing when no changes', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    // Create a service
+    $service = new class
+    {
+        public string $value = 'initial';
+    };
+
+    $container->singleton('test.service', fn () => $service);
+
+    $fiber = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+
+        // No changes made
+        $detector->verify($container);
+
+        expect(true)->toBeTrue();
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it handles verification with new services added after snapshot', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    $container->singleton('auth', fn () => new class
+    {
+        public string $user = 'test';
+    });
+
+    $fiber = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+
+        // Add new service after snapshot
+        $container->singleton('new.service', fn () => new stdClass);
+
+        // Should not throw because new.service wasn't in original snapshot
+        $detector->verify($container);
+
+        expect(true)->toBeTrue();
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});

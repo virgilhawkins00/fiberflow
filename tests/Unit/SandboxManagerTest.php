@@ -245,3 +245,103 @@ test('it integrates with pollution detector', function () {
 
     $fiber->start();
 });
+
+test('it returns false for hasSandbox when disabled', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+    $manager->setEnabled(false);
+
+    $fiber = new Fiber(function () use ($manager) {
+        $manager->createSandbox();
+        expect($manager->hasSandbox())->toBeFalse();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it returns zero active sandboxes when disabled', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+    $manager->setEnabled(false);
+
+    expect($manager->getActiveSandboxCount())->toBe(0);
+});
+
+test('it counts active sandboxes correctly', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+
+    expect($manager->getActiveSandboxCount())->toBe(0);
+
+    $fiber1 = new Fiber(function () use ($manager) {
+        $manager->createSandbox();
+        Fiber::suspend();
+    });
+
+    $fiber2 = new Fiber(function () use ($manager) {
+        $manager->createSandbox();
+        Fiber::suspend();
+    });
+
+    $fiber1->start();
+    expect($manager->getActiveSandboxCount())->toBe(1);
+
+    $fiber2->start();
+    expect($manager->getActiveSandboxCount())->toBe(2);
+});
+
+test('it verifies integrity with pollution detector', function () {
+    $baseContainer = new Container;
+    $pollutionDetector = Mockery::mock(\FiberFlow\Coroutine\ContainerPollutionDetector::class);
+
+    $pollutionDetector->shouldReceive('verify')
+        ->once()
+        ->with(Mockery::type(Container::class));
+
+    $manager = new SandboxManager($baseContainer, $pollutionDetector);
+
+    $fiber = new Fiber(function () use ($manager) {
+        $manager->verifyIntegrity();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it does not verify integrity when disabled', function () {
+    $baseContainer = new Container;
+    $pollutionDetector = Mockery::mock(\FiberFlow\Coroutine\ContainerPollutionDetector::class);
+
+    $pollutionDetector->shouldNotReceive('verify');
+
+    $manager = new SandboxManager($baseContainer, $pollutionDetector);
+    $manager->setEnabled(false);
+
+    $manager->verifyIntegrity();
+    expect(true)->toBeTrue();
+});
+
+test('it does not verify integrity without pollution detector', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+
+    $manager->verifyIntegrity();
+    expect(true)->toBeTrue();
+});
+
+test('it returns pollution detector', function () {
+    $baseContainer = new Container;
+    $pollutionDetector = Mockery::mock(\FiberFlow\Coroutine\ContainerPollutionDetector::class);
+
+    $manager = new SandboxManager($baseContainer, $pollutionDetector);
+
+    expect($manager->getPollutionDetector())->toBe($pollutionDetector);
+});
+
+test('it creates default pollution detector when none provided', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+
+    expect($manager->getPollutionDetector())->toBeInstanceOf(\FiberFlow\Coroutine\ContainerPollutionDetector::class);
+});
