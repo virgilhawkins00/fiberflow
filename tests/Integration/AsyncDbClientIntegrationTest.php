@@ -158,3 +158,39 @@ test('it handles query errors gracefully', function () {
         expect($e->getMessage())->toContain('non_existent_table');
     }
 });
+
+test('it throws exception when AsyncDb is not enabled for select', function () {
+    // Create client with disabled AsyncDb
+    config(['fiberflow.database.enabled' => false]);
+    $disabledClient = new AsyncDbClient(poolSize: 5);
+
+    expect(fn () => $disabledClient->select('SELECT 1'))
+        ->toThrow(\RuntimeException::class, 'AsyncDb is not enabled');
+});
+
+test('it throws exception when AsyncDb is not enabled for insert', function () {
+    // Create client with disabled AsyncDb
+    config(['fiberflow.database.enabled' => false]);
+    $disabledClient = new AsyncDbClient(poolSize: 5);
+
+    expect(fn () => $disabledClient->insert('INSERT INTO test VALUES (1)'))
+        ->toThrow(\RuntimeException::class, 'AsyncDb is not enabled');
+});
+
+test('it throws exception when AsyncDb is not enabled for update', function () {
+    // Create client with disabled AsyncDb
+    config(['fiberflow.database.enabled' => false]);
+    $disabledClient = new AsyncDbClient(poolSize: 5);
+
+    expect(fn () => $disabledClient->update('UPDATE test SET id = 1'))
+        ->toThrow(\RuntimeException::class, 'AsyncDb is not enabled');
+});
+
+test('it throws exception when AsyncDb is not enabled for delete', function () {
+    // Create client with disabled AsyncDb
+    config(['fiberflow.database.enabled' => false]);
+    $disabledClient = new AsyncDbClient(poolSize: 5);
+
+    expect(fn () => $disabledClient->delete('DELETE FROM test'))
+        ->toThrow(\RuntimeException::class, 'AsyncDb is not enabled');
+});
