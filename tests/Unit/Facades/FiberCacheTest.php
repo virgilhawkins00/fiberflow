@@ -343,3 +343,12 @@ it('can use fiberForget to remove values', function () {
 
     $fiber->start();
 });
+
+it('uses parent facade instance when not in fiber context', function () {
+    // Call a cache method outside of a Fiber - should use parent::resolveFacadeInstance
+    // This will trigger resolveFacadeInstance with Fiber::getCurrent() === null
+    FiberCache::put('test_key_outside_fiber', 'test_value', 60);
+    $value = FiberCache::get('test_key_outside_fiber');
+
+    expect($value)->toBe('test_value');
+});
