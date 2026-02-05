@@ -157,3 +157,46 @@ it('context returns null for missing keys without default', function () {
 
     $fiber->start();
 });
+
+it('resolves facade instance from fiber container when available', function () {
+    // Mock the sandbox manager
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+    $container = Mockery::mock(\Illuminate\Container\Container::class);
+
+    $sandboxManager->shouldReceive('getCurrentContainer')
+        ->andReturn($container);
+
+    $container->shouldReceive('make')
+        ->with('fiberflow.cache')
+        ->andReturn(app('cache'));
+
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $fiber = new Fiber(function () {
+        // This will trigger resolveFacadeInstance
+        $key = FiberCache::fiberKey('test');
+        expect($key)->toContain('fiber:');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+it('falls back to parent facade instance when no fiber container', function () {
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+
+    $sandboxManager->shouldReceive('getCurrentContainer')
+        ->andReturn(null);
+
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $fiber = new Fiber(function () {
+        $key = FiberCache::fiberKey('test');
+        expect($key)->toContain('fiber:');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});

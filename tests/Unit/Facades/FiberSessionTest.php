@@ -137,3 +137,68 @@ it('handles session operations outside fiber', function () {
 
     expect(true)->toBeTrue();
 });
+
+it('resolves facade accessor correctly', function () {
+    $accessor = (new ReflectionClass(FiberSession::class))
+        ->getMethod('getFacadeAccessor')
+        ->invoke(null);
+
+    expect($accessor)->toBe('fiberflow.session');
+});
+
+it('resolves facade instance from fiber container when available', function () {
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+    $container = Mockery::mock(\Illuminate\Container\Container::class);
+
+    $sandboxManager->shouldReceive('getCurrentContainer')
+        ->andReturn($container);
+
+    $container->shouldReceive('make')
+        ->with('fiberflow.session')
+        ->andReturn(app('session'));
+
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $result = null;
+    $fiber = new Fiber(function () use (&$result) {
+        FiberSession::fiberPut('test', 'value');
+        $result = FiberSession::fiberGet('test');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+
+    expect($result)->toBe('value');
+});
+
+it('falls back to parent facade instance when no fiber container', function () {
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+
+    $sandboxManager->shouldReceive('getCurrentContainer')
+        ->andReturn(null);
+
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $result = null;
+    $fiber = new Fiber(function () use (&$result) {
+        FiberSession::fiberPut('test', 'value');
+        $result = FiberSession::fiberGet('test');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+
+    expect($result)->toBe('value');
+});
+
+it('returns null for missing session keys without default', function () {
+    $fiber = new Fiber(function () {
+        $value = FiberSession::fiberGet('nonexistent');
+        expect($value)->toBeNull();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});

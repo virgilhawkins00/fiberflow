@@ -177,3 +177,49 @@ test('it can wrap callable that returns different types', function () {
     $objectResult = $handler->wrap(fn () => new stdClass);
     expect($objectResult)->toBeInstanceOf(stdClass::class);
 });
+
+it('handles exception with parent class handler using reflection', function () {
+    $handler = new ErrorHandler(null);
+
+    // Clear default handlers using reflection
+    $reflection = new ReflectionClass($handler);
+    $handlersProperty = $reflection->getProperty('handlers');
+    $handlersProperty->setAccessible(true);
+    $handlersProperty->setValue($handler, []);
+
+    $called = false;
+    $handler->register(Exception::class, function ($e) use (&$called) {
+        $called = true;
+    });
+
+    // RuntimeException extends Exception
+    $handler->handle(new RuntimeException('Test'));
+
+    expect($called)->toBeTrue();
+});
+
+it('uses specific handler over parent class handler using reflection', function () {
+    $handler = new ErrorHandler(null);
+
+    // Clear default handlers using reflection
+    $reflection = new ReflectionClass($handler);
+    $handlersProperty = $reflection->getProperty('handlers');
+    $handlersProperty->setAccessible(true);
+    $handlersProperty->setValue($handler, []);
+
+    $specificCalled = false;
+    $parentCalled = false;
+
+    $handler->register(Exception::class, function ($e) use (&$parentCalled) {
+        $parentCalled = true;
+    });
+
+    $handler->register(RuntimeException::class, function ($e) use (&$specificCalled) {
+        $specificCalled = true;
+    });
+
+    $handler->handle(new RuntimeException('Test'));
+
+    expect($specificCalled)->toBeTrue();
+    expect($parentCalled)->toBeFalse();
+});
