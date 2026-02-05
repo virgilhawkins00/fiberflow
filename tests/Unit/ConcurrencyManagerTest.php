@@ -288,6 +288,7 @@ test('it waits for all fibers with multiple iterations', function () {
 test('it executes usleep while waiting for fibers to complete', function () {
     $manager = new ConcurrencyManager(maxConcurrency: 5);
     $completed = false;
+    $iterations = 0;
 
     // Spawn a fiber that will be resumed after a delay
     $manager->spawn(function () use (&$completed) {
@@ -297,20 +298,27 @@ test('it executes usleep while waiting for fibers to complete', function () {
 
     expect($manager->getActiveCount())->toBe(1);
 
-    // Resume the fiber in background after a delay
-    $resumeFiber = new Fiber(function () use ($manager) {
-        usleep(30000); // 30ms - longer than waitForAll's 10ms sleep
+    // Resume the fiber in background after multiple iterations
+    $backgroundFiber = new Fiber(function () use ($manager, &$iterations) {
+        // Wait for at least 3 iterations of the waitForAll loop
+        while ($iterations < 3) {
+            usleep(5000); // 5ms
+            $iterations++;
+        }
+
+        // Now resume the suspended fiber
         foreach ($manager->getActiveFibers() as $fiber) {
             if ($fiber->isSuspended()) {
                 $fiber->resume();
             }
         }
     });
-    $resumeFiber->start();
+    $backgroundFiber->start();
 
-    // This should loop at least 3 times with usleep (30ms / 10ms)
+    // This should loop multiple times with usleep before the fiber is resumed
     $manager->waitForAll();
 
     expect($completed)->toBeTrue();
     expect($manager->getActiveCount())->toBe(0);
+    expect($iterations)->toBeGreaterThanOrEqual(3);
 });
