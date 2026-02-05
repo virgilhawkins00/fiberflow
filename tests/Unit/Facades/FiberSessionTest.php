@@ -149,20 +149,31 @@ it('resolves facade accessor correctly', function () {
 it('resolves facade instance from fiber container when available', function () {
     $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
     $container = Mockery::mock(\Illuminate\Container\Container::class);
+    $sessionStore = Mockery::mock(\Illuminate\Session\Store::class);
 
     $sandboxManager->shouldReceive('getCurrentContainer')
         ->andReturn($container);
 
     $container->shouldReceive('make')
         ->with('fiberflow.session')
-        ->andReturn(app('session'));
+        ->andReturn($sessionStore);
+
+    $sessionStore->shouldReceive('put')
+        ->with('test', 'value')
+        ->once();
+
+    $sessionStore->shouldReceive('get')
+        ->with('test')
+        ->andReturn('value')
+        ->once();
 
     app()->instance('fiberflow.sandbox', $sandboxManager);
 
     $result = null;
     $fiber = new Fiber(function () use (&$result) {
-        FiberSession::fiberPut('test', 'value');
-        $result = FiberSession::fiberGet('test');
+        // Call facade methods directly to trigger resolveFacadeInstance
+        FiberSession::put('test', 'value');
+        $result = FiberSession::get('test');
 
         Fiber::suspend();
     });
@@ -229,4 +240,13 @@ it('handles fiberFlash outside fiber context', function () {
     FiberSession::fiberFlash('key', 'value');
 
     expect(true)->toBeTrue();
+});
+
+it('uses parent facade instance when not in fiber context', function () {
+    // Call session methods outside of a Fiber - should use parent::resolveFacadeInstance
+    // This will trigger resolveFacadeInstance with Fiber::getCurrent() === null
+    session()->put('test_session_key', 'test_value');
+    $value = FiberSession::get('test_session_key');
+
+    expect($value)->toBe('test_value');
 });
