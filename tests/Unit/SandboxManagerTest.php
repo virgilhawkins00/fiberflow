@@ -181,3 +181,67 @@ test('it cleans up sandbox after fiber completes', function () {
     // After fiber completes, WeakMap should clean up
     expect(true)->toBeTrue();
 });
+
+test('it returns base container when disabled and not in fiber', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+    $manager->setEnabled(false);
+
+    $container = $manager->createSandbox();
+
+    expect($container)->toBe($baseContainer);
+});
+
+test('it returns base container when disabled in getCurrentContainer', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+    $manager->setEnabled(false);
+
+    $fiber = new Fiber(function () use ($manager, $baseContainer) {
+        $container = $manager->getCurrentContainer();
+        expect($container)->toBe($baseContainer);
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it does nothing when destroying sandbox while disabled', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+    $manager->setEnabled(false);
+
+    $fiber = new Fiber(function () use ($manager) {
+        $manager->destroySandbox();
+        expect(true)->toBeTrue();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it does nothing when destroying sandbox outside fiber', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+
+    $manager->destroySandbox();
+    expect(true)->toBeTrue();
+});
+
+test('it integrates with pollution detector', function () {
+    $baseContainer = new Container;
+    $pollutionDetector = Mockery::mock(\FiberFlow\Coroutine\ContainerPollutionDetector::class);
+
+    $pollutionDetector->shouldReceive('takeSnapshot')
+        ->once()
+        ->with(Mockery::type(Container::class));
+
+    $manager = new SandboxManager($baseContainer, $pollutionDetector);
+
+    $fiber = new Fiber(function () use ($manager) {
+        $manager->createSandbox();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});

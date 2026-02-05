@@ -257,3 +257,113 @@ test('it can toggle enabled state', function () {
     $detector->setEnabled(true);
     expect($detector->isEnabled())->toBeTrue();
 });
+
+test('it captures non-object state correctly', function () {
+    $detector = new ContainerPollutionDetector;
+
+    $reflection = new ReflectionClass($detector);
+    $method = $reflection->getMethod('captureState');
+    $method->setAccessible(true);
+
+    // Test with string
+    $state = $method->invoke($detector, 'test string');
+    expect($state)->toHaveKey('type');
+    expect($state)->toHaveKey('value');
+    expect($state['type'])->toBe('string');
+    expect($state['value'])->toBe('test string');
+
+    // Test with integer
+    $state = $method->invoke($detector, 42);
+    expect($state['type'])->toBe('integer');
+    expect($state['value'])->toBe(42);
+});
+
+test('it gets object properties with id method', function () {
+    $detector = new ContainerPollutionDetector;
+
+    $object = new class
+    {
+        public function id()
+        {
+            return 123;
+        }
+    };
+
+    $reflection = new ReflectionClass($detector);
+    $method = $reflection->getMethod('getObjectProperties');
+    $method->setAccessible(true);
+
+    $properties = $method->invoke($detector, $object);
+
+    expect($properties)->toHaveKey('user_id');
+    expect($properties['user_id'])->toBe(123);
+});
+
+test('it gets object properties with getId method', function () {
+    $detector = new ContainerPollutionDetector;
+
+    $object = new class
+    {
+        public function getId()
+        {
+            return 'session-123';
+        }
+    };
+
+    $reflection = new ReflectionClass($detector);
+    $method = $reflection->getMethod('getObjectProperties');
+    $method->setAccessible(true);
+
+    $properties = $method->invoke($detector, $object);
+
+    expect($properties)->toHaveKey('session_id');
+    expect($properties['session_id'])->toBe('session-123');
+});
+
+test('it detects state changes in object hash', function () {
+    $detector = new ContainerPollutionDetector;
+
+    $object1 = new stdClass;
+    $object2 = new stdClass;
+
+    $reflection = new ReflectionClass($detector);
+    $hasStateChanged = $reflection->getMethod('hasStateChanged');
+    $hasStateChanged->setAccessible(true);
+
+    $original = ['hash' => spl_object_hash($object1)];
+    $current = ['hash' => spl_object_hash($object2)];
+
+    $changed = $hasStateChanged->invoke($detector, $original, $current);
+
+    expect($changed)->toBeTrue();
+});
+
+test('it detects state changes in properties', function () {
+    $detector = new ContainerPollutionDetector;
+
+    $reflection = new ReflectionClass($detector);
+    $hasStateChanged = $reflection->getMethod('hasStateChanged');
+    $hasStateChanged->setAccessible(true);
+
+    $original = ['properties' => ['user_id' => 1]];
+    $current = ['properties' => ['user_id' => 2]];
+
+    $changed = $hasStateChanged->invoke($detector, $original, $current);
+
+    expect($changed)->toBeTrue();
+});
+
+test('it detects missing properties', function () {
+    $detector = new ContainerPollutionDetector;
+
+    $reflection = new ReflectionClass($detector);
+    $hasStateChanged = $reflection->getMethod('hasStateChanged');
+    $hasStateChanged->setAccessible(true);
+
+    $original = ['properties' => ['user_id' => 1, 'session_id' => 'abc']];
+    $current = ['properties' => ['user_id' => 1]];
+
+    $changed = $hasStateChanged->invoke($detector, $original, $current);
+
+    expect($changed)->toBeTrue();
+});
