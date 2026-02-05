@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fiberflow_test
+      MYSQL_USER: fiberflow
+      MYSQL_PASSWORD: fiberflow
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    tmpfs:
+      - /var/lib/mysql
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    platform: linux/amd64
+    environment:
+      RABBITMQ_DEFAULT_USER: fiberflow
+      RABBITMQ_DEFAULT_PASS: fiberflow
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  httpbin:
+    image: kennethreitz/httpbin
+    platform: linux/amd64
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/status/200"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+

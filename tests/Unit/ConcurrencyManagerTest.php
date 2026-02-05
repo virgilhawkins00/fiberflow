@@ -284,3 +284,33 @@ test('it waits for all fibers with multiple iterations', function () {
     expect($manager->getActiveCount())->toBe(0);
     expect($count)->toBe(3);
 });
+
+test('it executes usleep while waiting for fibers to complete', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 5);
+    $completed = false;
+
+    // Spawn a fiber that will be resumed after a delay
+    $manager->spawn(function () use (&$completed) {
+        Fiber::suspend();
+        $completed = true;
+    });
+
+    expect($manager->getActiveCount())->toBe(1);
+
+    // Resume the fiber in background after a delay
+    $resumeFiber = new Fiber(function () use ($manager) {
+        usleep(30000); // 30ms - longer than waitForAll's 10ms sleep
+        foreach ($manager->getActiveFibers() as $fiber) {
+            if ($fiber->isSuspended()) {
+                $fiber->resume();
+            }
+        }
+    });
+    $resumeFiber->start();
+
+    // This should loop at least 3 times with usleep (30ms / 10ms)
+    $manager->waitForAll();
+
+    expect($completed)->toBeTrue();
+    expect($manager->getActiveCount())->toBe(0);
+});

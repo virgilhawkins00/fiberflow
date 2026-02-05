@@ -309,3 +309,37 @@ test('it uses throwable handler as fallback when no specific handler matches', f
 
     expect($throwableCalled)->toBeTrue();
 });
+
+test('it uses throwable handler as last resort fallback', function () {
+    // Create handler without default handlers
+    $handler = new class extends \FiberFlow\ErrorHandling\ErrorHandler
+    {
+        public function __construct()
+        {
+            // Skip default handlers registration
+            $this->handlers = [];
+        }
+
+        public function getHandlers(): array
+        {
+            return $this->handlers;
+        }
+    };
+
+    $throwableCalled = false;
+
+    // Register a specific handler first
+    $handler->register(\RuntimeException::class, function () {
+        // This won't be called
+    });
+
+    // Then register Throwable handler
+    $handler->register(Throwable::class, function () use (&$throwableCalled) {
+        $throwableCalled = true;
+    });
+
+    // Throw a different exception that doesn't match RuntimeException
+    $handler->handle(new \LogicException('Test exception'));
+
+    expect($throwableCalled)->toBeTrue();
+});

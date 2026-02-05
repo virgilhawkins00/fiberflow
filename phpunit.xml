@@ -20,7 +20,7 @@
             <directory>src</directory>
         </include>
     </source>
-    <coverage>
+    <coverage includeUncoveredFiles="true" pathCoverage="false" ignoreDeprecatedCodeUnits="true" disableCodeCoverageIgnore="false">
         <report>
             <html outputDirectory="coverage/html"/>
             <text outputFile="php://stdout" showUncoveredFiles="true"/>

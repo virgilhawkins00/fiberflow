@@ -247,3 +247,42 @@ it('can verify delete method signature', function () {
     expect($method->getNumberOfParameters())->toBe(2);
     expect($method->getNumberOfRequiredParameters())->toBe(1);
 });
+
+it('can verify calculateBackoffDelay method exists', function () {
+    $reflection = new ReflectionClass($this->client);
+    expect($reflection->hasMethod('calculateBackoffDelay'))->toBeTrue();
+});
+
+it('can verify requestAsync method exists', function () {
+    $reflection = new ReflectionClass($this->client);
+    expect($reflection->hasMethod('requestAsync'))->toBeTrue();
+});
+
+it('can verify requestSync method exists', function () {
+    $reflection = new ReflectionClass($this->client);
+    expect($reflection->hasMethod('requestSync'))->toBeTrue();
+});
+
+it('can create client with zero retry attempts', function () {
+    $client = new AsyncHttpClient(retryAttempts: 0);
+
+    expect($client)->toBeInstanceOf(AsyncHttpClient::class);
+});
+
+it('can create client with high retry attempts', function () {
+    $client = new AsyncHttpClient(retryAttempts: 10);
+
+    expect($client)->toBeInstanceOf(AsyncHttpClient::class);
+});
+
+it('can create client with very short retry delay', function () {
+    $client = new AsyncHttpClient(retryDelay: 100);
+
+    expect($client)->toBeInstanceOf(AsyncHttpClient::class);
+});
+
+it('can create client with very long retry delay', function () {
+    $client = new AsyncHttpClient(retryDelay: 5000);
+
+    expect($client)->toBeInstanceOf(AsyncHttpClient::class);
+});

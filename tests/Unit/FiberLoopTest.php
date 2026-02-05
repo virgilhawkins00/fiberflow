@@ -270,3 +270,39 @@ it('has stats property', function () {
 
     expect($stats)->toBeArray();
 });
+
+it('can verify run method signature', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('run');
+
+    expect($method->getNumberOfParameters())->toBe(3);
+    expect($method->getNumberOfRequiredParameters())->toBe(2);
+});
+
+it('can verify processNextJob method is protected', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('processNextJob');
+
+    expect($method->isProtected())->toBeTrue();
+});
+
+it('can verify registerSignalHandlers method is protected', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('registerSignalHandlers');
+
+    expect($method->isProtected())->toBeTrue();
+});
+
+it('can verify createWorkerOptions method is protected', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('createWorkerOptions');
+
+    expect($method->isProtected())->toBeTrue();
+});
+
+it('can verify shutdown method is protected', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $method = $reflection->getMethod('shutdown');
+
+    expect($method->isProtected())->toBeTrue();
+});
