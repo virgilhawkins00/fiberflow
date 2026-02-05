@@ -79,3 +79,70 @@ it('can toggle between running and paused', function () {
     $this->controller->resume();
     expect($this->controller->isRunning())->toBeTrue();
 });
+
+it('can check all state methods', function () {
+    // Running state
+    expect($this->controller->isRunning())->toBeTrue();
+    expect($this->controller->isPaused())->toBeFalse();
+    expect($this->controller->isStopping())->toBeFalse();
+    expect($this->controller->isStopped())->toBeFalse();
+
+    // Paused state
+    $this->controller->pause();
+    expect($this->controller->isRunning())->toBeFalse();
+    expect($this->controller->isPaused())->toBeTrue();
+    expect($this->controller->isStopping())->toBeFalse();
+    expect($this->controller->isStopped())->toBeFalse();
+
+    // Stopping state
+    $this->controller->stop();
+    expect($this->controller->isRunning())->toBeFalse();
+    expect($this->controller->isPaused())->toBeFalse();
+    expect($this->controller->isStopping())->toBeTrue();
+    expect($this->controller->isStopped())->toBeFalse();
+
+    // Stopped state
+    $this->controller->forceStop();
+    expect($this->controller->isRunning())->toBeFalse();
+    expect($this->controller->isPaused())->toBeFalse();
+    expect($this->controller->isStopping())->toBeFalse();
+    expect($this->controller->isStopped())->toBeTrue();
+});
+
+it('maintains state consistency', function () {
+    $states = ['running', 'paused', 'stopping', 'stopped'];
+
+    foreach ($states as $state) {
+        $currentState = $this->controller->getState();
+        expect($currentState)->toBeIn($states);
+
+        if ($state === 'paused') {
+            $this->controller->pause();
+        } elseif ($state === 'stopping') {
+            $this->controller->stop();
+        } elseif ($state === 'stopped') {
+            $this->controller->forceStop();
+        }
+    }
+
+    expect(true)->toBeTrue();
+});
+
+it('can transition from running to stopping directly', function () {
+    expect($this->controller->isRunning())->toBeTrue();
+
+    $this->controller->stop();
+
+    expect($this->controller->isStopping())->toBeTrue();
+    expect($this->controller->isRunning())->toBeFalse();
+});
+
+it('can transition from paused to stopping', function () {
+    $this->controller->pause();
+    expect($this->controller->isPaused())->toBeTrue();
+
+    $this->controller->stop();
+
+    expect($this->controller->isStopping())->toBeTrue();
+    expect($this->controller->isPaused())->toBeFalse();
+});

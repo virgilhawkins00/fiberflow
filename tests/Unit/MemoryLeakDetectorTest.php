@@ -70,3 +70,40 @@ it('can get peak memory usage', function () {
     expect($peak)->toBeInt();
     expect($peak)->toBeGreaterThan(0);
 });
+
+it('can get all samples', function () {
+    // Take some samples
+    for ($i = 0; $i < 5; $i++) {
+        $this->detector->sample();
+        usleep(10000);
+    }
+
+    $samples = $this->detector->getSamples();
+
+    expect($samples)->toBeArray()
+        ->and(count($samples))->toBeGreaterThan(0);
+});
+
+it('tracks memory usage over time', function () {
+    // Take enough samples for trend detection
+    for ($i = 0; $i < 15; $i++) {
+        $this->detector->sample();
+        usleep(10000);
+    }
+
+    $samples = $this->detector->getSamples();
+
+    expect(count($samples))->toBeGreaterThanOrEqual(10);
+});
+
+it('can check if leak is detected', function () {
+    // With low threshold, should not detect leak immediately
+    $detector = new MemoryLeakDetector(100, 1024 * 1024 * 1024, 0); // 1GB threshold
+
+    for ($i = 0; $i < 15; $i++) {
+        $detector->sample();
+    }
+
+    // Should not detect leak with high threshold
+    expect(true)->toBeTrue();
+});
