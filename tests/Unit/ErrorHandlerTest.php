@@ -122,3 +122,58 @@ test('it gets all registered handlers', function () {
     expect($handlers)->toHaveKey(FiberCrashException::class);
     expect($handlers)->toHaveKey(Throwable::class);
 });
+
+test('it handles exceptions without specific handler using Throwable fallback', function () {
+    $handler = new ErrorHandler;
+    $handled = false;
+
+    // Override the Throwable handler to track if it was called
+    $handler->register(Throwable::class, function () use (&$handled) {
+        $handled = true;
+    });
+
+    // Create a custom exception that doesn't have a specific handler
+    $exception = new class extends \Exception {};
+    $handler->handle($exception);
+
+    expect($handled)->toBeTrue();
+});
+
+test('it can handle multiple different exception types', function () {
+    $handler = new ErrorHandler;
+    $handledTypes = [];
+
+    $handler->register(RuntimeException::class, function ($e) use (&$handledTypes) {
+        $handledTypes[] = 'runtime';
+    });
+
+    $handler->register(InvalidArgumentException::class, function ($e) use (&$handledTypes) {
+        $handledTypes[] = 'invalid_argument';
+    });
+
+    $handler->handle(new RuntimeException('test1'));
+    $handler->handle(new InvalidArgumentException('test2'));
+
+    expect($handledTypes)->toBe(['runtime', 'invalid_argument']);
+});
+
+test('it initializes with metrics collector', function () {
+    $metrics = new MetricsCollector;
+    $handler = new ErrorHandler($metrics);
+
+    expect($handler)->toBeInstanceOf(ErrorHandler::class);
+    expect($handler->hasHandler(FiberCrashException::class))->toBeTrue();
+});
+
+test('it can wrap callable that returns different types', function () {
+    $handler = new ErrorHandler;
+
+    $stringResult = $handler->wrap(fn () => 'hello');
+    expect($stringResult)->toBe('hello');
+
+    $arrayResult = $handler->wrap(fn () => [1, 2, 3]);
+    expect($arrayResult)->toBe([1, 2, 3]);
+
+    $objectResult = $handler->wrap(fn () => new stdClass);
+    expect($objectResult)->toBeInstanceOf(stdClass::class);
+});

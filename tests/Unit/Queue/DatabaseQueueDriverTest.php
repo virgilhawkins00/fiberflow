@@ -281,3 +281,120 @@ it('handles multiple delete operations', function () {
 
     expect(true)->toBeTrue();
 });
+
+it('can set custom table name', function () {
+    $connection = Mockery::mock(AsyncDbConnection::class);
+    $driver = new DatabaseQueueDriver($connection, 'default');
+
+    $result = $driver->setTable('custom_jobs');
+
+    expect($result)->toBe($driver);
+});
+
+it('uses custom table name for operations', function () {
+    $connection = Mockery::mock(AsyncDbConnection::class);
+    $driver = new DatabaseQueueDriver($connection, 'default');
+    $driver->setTable('custom_jobs');
+
+    $connection->shouldReceive('insert')
+        ->once()
+        ->with('custom_jobs', Mockery::type('array'))
+        ->andReturn(1);
+
+    $driver->push('default', '{"job":"test"}', 0);
+});
+
+it('pops job and updates reservation', function () {
+    $connection = Mockery::mock(AsyncDbConnection::class);
+    $driver = new DatabaseQueueDriver($connection, 'default');
+
+    $jobData = [
+        'id' => 1,
+        'queue' => 'default',
+        'payload' => '{"job":"test"}',
+        'attempts' => 0,
+        'reserved_at' => null,
+        'available_at' => time(),
+        'created_at' => time(),
+    ];
+
+    $connection->shouldReceive('fetchOne')
+        ->once()
+        ->andReturn($jobData);
+
+    $connection->shouldReceive('update')
+        ->once()
+        ->with('jobs', Mockery::on(function ($data) {
+            return isset($data['reserved_at']) && isset($data['attempts']);
+        }), ['id' => 1]);
+
+    // Note: We can't test the actual Job creation without full Laravel setup
+    // This test verifies the database operations are correct
+    try {
+        $driver->pop('default');
+    } catch (\Throwable $e) {
+        // Expected to fail when creating DatabaseJob without proper Laravel setup
+        // But the database operations should have been called
+    }
+});
+
+it('calculates available_at correctly for delayed jobs', function () {
+    $connection = Mockery::mock(AsyncDbConnection::class);
+    $driver = new DatabaseQueueDriver($connection, 'default');
+
+    $delay = 60; // 60 seconds
+    $beforeTime = time();
+
+    $connection->shouldReceive('insert')
+        ->once()
+        ->with('jobs', Mockery::on(function ($data) use ($beforeTime, $delay) {
+            $expectedAvailableAt = $beforeTime + $delay;
+            // Allow 1 second tolerance for test execution time
+            return abs($data['available_at'] - $expectedAvailableAt) <= 1;
+        }))
+        ->andReturn(1);
+
+    $driver->push('default', '{"job":"test"}', $delay);
+});
+
+it('increments attempts when popping job', function () {
+    $connection = Mockery::mock(AsyncDbConnection::class);
+    $driver = new DatabaseQueueDriver($connection, 'default');
+
+    $jobData = [
+        'id' => 1,
+        'queue' => 'default',
+        'payload' => '{"job":"test"}',
+        'attempts' => 2,
+        'reserved_at' => null,
+        'available_at' => time(),
+        'created_at' => time(),
+    ];
+
+    $connection->shouldReceive('fetchOne')
+        ->once()
+        ->andReturn($jobData);
+
+    $connection->shouldReceive('update')
+        ->once()
+        ->with('jobs', Mockery::on(function ($data) {
+            return $data['attempts'] === 3; // Should increment from 2 to 3
+        }), ['id' => 1]);
+
+    try {
+        $driver->pop('default');
+    } catch (\Throwable $e) {
+        // Expected to fail when creating DatabaseJob without proper Laravel setup
+    }
+});
+
+it('clears all jobs from specific queue only', function () {
+    $connection = Mockery::mock(AsyncDbConnection::class);
+    $driver = new DatabaseQueueDriver($connection, 'default');
+
+    $connection->shouldReceive('delete')
+        ->once()
+        ->with('jobs', ['queue' => 'emails']);
+
+    $driver->clear('emails');
+});
