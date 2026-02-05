@@ -180,3 +180,75 @@ it('has handleHelp method', function () {
     $reflection = new ReflectionClass($this->controls);
     expect($reflection->hasMethod('handleHelp'))->toBeTrue();
 });
+
+it('handles SIGTERM signal to stop worker', function () {
+    if (! extension_loaded('pcntl')) {
+        $this->markTestSkipped('PCNTL extension not available');
+    }
+
+    $controls = new InteractiveControls;
+
+    // Send SIGTERM signal to current process
+    posix_kill(posix_getpid(), SIGTERM);
+
+    // Process pending signals
+    pcntl_signal_dispatch();
+
+    expect($controls->shouldStop())->toBeTrue();
+    expect($controls->getState())->toBe('stopping');
+});
+
+it('handles SIGINT signal to stop worker', function () {
+    if (! extension_loaded('pcntl')) {
+        $this->markTestSkipped('PCNTL extension not available');
+    }
+
+    $controls = new InteractiveControls;
+
+    // Send SIGINT signal to current process
+    posix_kill(posix_getpid(), SIGINT);
+
+    // Process pending signals
+    pcntl_signal_dispatch();
+
+    expect($controls->shouldStop())->toBeTrue();
+    expect($controls->getState())->toBe('stopping');
+});
+
+it('handles SIGUSR1 signal to pause worker', function () {
+    if (! extension_loaded('pcntl')) {
+        $this->markTestSkipped('PCNTL extension not available');
+    }
+
+    $controls = new InteractiveControls;
+
+    // Send SIGUSR1 signal to current process
+    posix_kill(posix_getpid(), SIGUSR1);
+
+    // Process pending signals
+    pcntl_signal_dispatch();
+
+    expect($controls->isPaused())->toBeTrue();
+    expect($controls->getState())->toBe('paused');
+});
+
+it('handles SIGUSR2 signal to resume worker', function () {
+    if (! extension_loaded('pcntl')) {
+        $this->markTestSkipped('PCNTL extension not available');
+    }
+
+    $controls = new InteractiveControls;
+
+    // First pause the worker
+    $controls->pause();
+    expect($controls->isPaused())->toBeTrue();
+
+    // Send SIGUSR2 signal to current process
+    posix_kill(posix_getpid(), SIGUSR2);
+
+    // Process pending signals
+    pcntl_signal_dispatch();
+
+    expect($controls->isRunning())->toBeTrue();
+    expect($controls->getState())->toBe('running');
+});
