@@ -82,4 +82,3 @@ test('fiber loop is registered as singleton', function () {
 
     expect($loop1)->toBe($loop2);
 });
-

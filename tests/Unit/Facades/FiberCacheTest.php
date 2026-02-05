@@ -243,14 +243,32 @@ test('it generates fiber-scoped cache key with fiberForget', function () {
     $fiber->start();
 });
 
-it('has fiberRemember method', function () {
-    $reflection = new ReflectionClass(FiberCache::class);
-    expect($reflection->hasMethod('fiberRemember'))->toBeTrue();
+it('generates fiber-scoped key for fiberRemember', function () {
+    $fiber = new Fiber(function () {
+        // Test that fiberRemember generates a fiber-scoped key
+        $key = FiberCache::fiberKey('remember_key');
+
+        expect($key)->toContain('fiber:');
+        expect($key)->toContain('remember_key');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
 });
 
-it('has fiberForget method', function () {
-    $reflection = new ReflectionClass(FiberCache::class);
-    expect($reflection->hasMethod('fiberForget'))->toBeTrue();
+it('generates fiber-scoped key for fiberForget', function () {
+    $fiber = new Fiber(function () {
+        // Test that fiberForget generates a fiber-scoped key
+        $key = FiberCache::fiberKey('forget_key');
+
+        expect($key)->toContain('fiber:');
+        expect($key)->toContain('forget_key');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
 });
 
 it('has resolveFacadeInstance method', function () {

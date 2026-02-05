@@ -141,7 +141,8 @@ it('can clear failures for a job', function () {
 
 it('uses job id property if available', function () {
     $fiber = new Fiber(fn () => null);
-    $job = new class {
+    $job = new class
+    {
         public $id = 'custom-id-123';
     };
 
@@ -153,7 +154,8 @@ it('uses job id property if available', function () {
 
 it('uses job uuid property if id not available', function () {
     $fiber = new Fiber(fn () => null);
-    $job = new class {
+    $job = new class
+    {
         public $uuid = 'custom-uuid-456';
     };
 

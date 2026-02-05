@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Tests\Integration;
 
 use FiberFlow\Database\AsyncDbClient;
-use Tests\Integration\IntegrationTestCase;
 
 uses(IntegrationTestCase::class)->group('integration', 'database');
 
 beforeEach(function () {
     // Skip if MySQL is not available
-    if (!$this->isMySqlAvailable()) {
+    if (! $this->isMySqlAvailable()) {
         $this->markTestSkipped('MySQL not available for integration tests');
     }
 
@@ -39,7 +38,7 @@ test('it can insert records', function () {
     // Test insert() method (lines 79-87) - exercises INSERT operation
     $insertedId = $this->client->insert(
         'INSERT INTO fiberflow_test_users (name, email) VALUES (?, ?)',
-        ['John Doe', 'john@example.com']
+        ['John Doe', 'john@example.com'],
     );
 
     expect($insertedId)->toBeGreaterThan(0);
@@ -55,13 +54,13 @@ test('it can update records', function () {
     // Insert a record first
     $id = $this->client->insert(
         'INSERT INTO fiberflow_test_users (name, email) VALUES (?, ?)',
-        ['John Doe', 'john@example.com']
+        ['John Doe', 'john@example.com'],
     );
 
     // Test update() method (lines 95-103) - exercises UPDATE operation
     $affectedRows = $this->client->update(
         'UPDATE fiberflow_test_users SET name = ? WHERE id = ?',
-        ['Jane Doe', $id]
+        ['Jane Doe', $id],
     );
 
     expect($affectedRows)->toBe(1);
@@ -78,17 +77,17 @@ test('it can delete records', function () {
     // Insert records
     $id1 = $this->client->insert(
         'INSERT INTO fiberflow_test_users (name, email) VALUES (?, ?)',
-        ['User 1', 'user1@example.com']
+        ['User 1', 'user1@example.com'],
     );
     $id2 = $this->client->insert(
         'INSERT INTO fiberflow_test_users (name, email) VALUES (?, ?)',
-        ['User 2', 'user2@example.com']
+        ['User 2', 'user2@example.com'],
     );
 
     // Test delete() method (lines 113-126) - exercises DELETE operation
     $affectedRows = $this->client->delete(
         'DELETE FROM fiberflow_test_users WHERE id = ?',
-        [$id1]
+        [$id1],
     );
 
     expect($affectedRows)->toBe(1);
@@ -103,7 +102,7 @@ test('it can execute select queries with bindings', function () {
     // Test select with bindings - exercises select() method (lines 65-71)
     $result = $this->client->select(
         'SELECT ? as value, ? as name',
-        [42, 'test']
+        [42, 'test'],
     );
 
     expect($result)->toBeArray();
@@ -143,7 +142,7 @@ test('it can use connection pool efficiently', function () {
     for ($i = 1; $i <= 20; $i++) {
         $results[] = $this->client->select('SELECT ? as value', [$i]);
     }
-    
+
     expect($results)->toHaveCount(20);
     foreach ($results as $index => $result) {
         expect($result[0]['value'])->toBe($index + 1);
@@ -159,4 +158,3 @@ test('it handles query errors gracefully', function () {
         expect($e->getMessage())->toContain('non_existent_table');
     }
 });
-

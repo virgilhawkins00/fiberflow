@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-use FiberFlow\Coroutine\ConcurrencyManager;
 use FiberFlow\Coroutine\SandboxManager;
 use FiberFlow\FiberFlowServiceProvider;
-use FiberFlow\Loop\FiberLoop;
 use FiberFlow\Metrics\MetricsCollector;
 
 beforeEach(function () {

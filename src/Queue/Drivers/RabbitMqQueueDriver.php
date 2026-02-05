@@ -6,7 +6,6 @@ namespace FiberFlow\Queue\Drivers;
 
 use FiberFlow\Queue\Contracts\AsyncQueueDriver;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Queue\Jobs\RedisJob;
 use PHPinnacle\Ridge\Channel;
 use PHPinnacle\Ridge\Client;
 use PHPinnacle\Ridge\Message;
@@ -59,7 +58,7 @@ class RabbitMqQueueDriver implements AsyncQueueDriver
                 $this->config['password'] ?? 'guest',
                 $this->config['host'] ?? 'localhost',
                 $this->config['port'] ?? 5672,
-                $this->config['vhost'] ?? '/'
+                $this->config['vhost'] ?? '/',
             );
 
             $this->client = Client::create($dsn);

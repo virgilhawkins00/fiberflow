@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use FiberFlow\Loop\FiberLoop;
-use FiberFlow\Loop\ConcurrencyManager;
 use FiberFlow\Coroutine\SandboxManager;
-use Tests\Integration\IntegrationTestCase;
+use FiberFlow\Loop\ConcurrencyManager;
+use FiberFlow\Loop\FiberLoop;
 
 uses(IntegrationTestCase::class)->group('integration', 'fiberloop');
 

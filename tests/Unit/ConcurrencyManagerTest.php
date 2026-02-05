@@ -243,7 +243,7 @@ test('it waits for suspended fibers to complete', function () {
     // Resume the fiber in background
     $resumeFiber = new Fiber(function () use ($fiber) {
         usleep(20000); // 20ms
-        if (!$fiber->isTerminated()) {
+        if (! $fiber->isTerminated()) {
             $fiber->resume();
         }
     });
@@ -272,7 +272,7 @@ test('it waits for all fibers with multiple iterations', function () {
     $resumeFiber = new Fiber(function () use ($manager) {
         usleep(30000); // 30ms
         foreach ($manager->getActiveFibers() as $fiber) {
-            if (!$fiber->isTerminated()) {
+            if (! $fiber->isTerminated()) {
                 $fiber->resume();
             }
         }

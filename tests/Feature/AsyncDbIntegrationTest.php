@@ -71,4 +71,3 @@ test('it can create client with both custom pool size and timeout', function () 
 
     expect($client)->toBeInstanceOf(AsyncDbClient::class);
 });
-

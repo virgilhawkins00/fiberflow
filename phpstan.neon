@@ -4,12 +4,10 @@ parameters:
         - src
     tmpDir: build/phpstan
     ignoreErrors:
-        - '#unknown class Amp\\RabbitMq#'
-        - '#Instantiated class Amp\\RabbitMq#'
-        - '#has invalid return type Amp\\RabbitMq#'
         - '#Call to an undefined static method FiberFlow\\Facades#'
         - '#Expression on left side of \?\? is not nullable#'
         - '~Parameter \#3 \$job of class Illuminate\\Queue\\Jobs\\DatabaseJob constructor expects stdClass~'
-        - '#Call to an undefined method Amp\\Mysql\\MysqlConnectionPool::getLastInsertId#'
         - '#Callable callable\(\): T invoked with 1 parameter, 0 required#'
+        - '#Parameter \#1 \$message of method PHPinnacle\\Ridge\\Channel::ack\(\) expects PHPinnacle\\Ridge\\Message, int given#'
+        - '#Parameter \#1 \$message of method PHPinnacle\\Ridge\\Channel::nack\(\) expects PHPinnacle\\Ridge\\Message, int given#'
 

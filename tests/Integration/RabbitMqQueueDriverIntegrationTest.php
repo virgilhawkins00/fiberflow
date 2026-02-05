@@ -6,14 +6,12 @@ namespace Tests\Integration;
 
 use FiberFlow\Queue\Drivers\RabbitMqQueueDriver;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
-use Tests\Integration\IntegrationTestCase;
 
 uses(IntegrationTestCase::class)->group('integration', 'rabbitmq');
 
 beforeEach(function () {
     // Skip if RabbitMQ is not available
-    if (!$this->isRabbitMqAvailable()) {
+    if (! $this->isRabbitMqAvailable()) {
         $this->markTestSkipped('RabbitMQ not available for integration tests');
     }
 
@@ -34,7 +32,7 @@ beforeEach(function () {
             5673,
             'fiberflow',
             'fiberflow',
-            '/'
+            '/',
         );
         $channel = $connection->channel();
         $channel->queue_purge('fiberflow_test');
@@ -53,7 +51,7 @@ afterEach(function () {
             5673,
             'fiberflow',
             'fiberflow',
-            '/'
+            '/',
         );
         $channel = $connection->channel();
         $channel->queue_delete('fiberflow_test');
@@ -133,4 +131,3 @@ test('it can get queue size', function () {
     expect($size)->toBeInt();
     expect($size)->toBeGreaterThanOrEqual(0);
 });
-

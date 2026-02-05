@@ -349,6 +349,7 @@ it('calculates available_at correctly for delayed jobs', function () {
         ->once()
         ->with('jobs', Mockery::on(function ($data) use ($beforeTime, $delay) {
             $expectedAvailableAt = $beforeTime + $delay;
+
             // Allow 1 second tolerance for test execution time
             return abs($data['available_at'] - $expectedAvailableAt) <= 1;
         }))
