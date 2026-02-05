@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use FiberFlow\Coroutine\FiberContext;
 use FiberFlow\Facades\FiberAuth;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 it('resolves facade accessor', function () {
     $accessor = (new \ReflectionClass(FiberAuth::class))
@@ -11,10 +13,6 @@ it('resolves facade accessor', function () {
 
     expect($accessor)->toBe('fiberflow.auth');
 });
-
-use FiberFlow\Coroutine\FiberContext;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Mockery;
 
 it('has setFiberUser method', function () {
     $reflection = new ReflectionClass(FiberAuth::class);

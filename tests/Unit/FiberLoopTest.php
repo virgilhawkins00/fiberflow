@@ -10,7 +10,6 @@ use FiberFlow\Loop\FiberLoop;
 use FiberFlow\Metrics\MetricsCollector;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Support\Facades\Queue;
-use Mockery;
 
 beforeEach(function () {
     $this->concurrency = new ConcurrencyManager(10);
