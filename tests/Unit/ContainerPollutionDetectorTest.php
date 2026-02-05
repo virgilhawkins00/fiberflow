@@ -142,3 +142,118 @@ test('it works when not in a fiber context', function () {
 
     expect(true)->toBeTrue();
 });
+
+test('it can get isolated services list', function () {
+    $detector = new ContainerPollutionDetector;
+
+    // Use reflection to access protected property
+    $reflection = new ReflectionClass($detector);
+    $property = $reflection->getProperty('isolatedServices');
+    $property->setAccessible(true);
+
+    $services = $property->getValue($detector);
+
+    expect($services)->toBeArray();
+    expect($services)->toContain('auth');
+    expect($services)->toContain('session');
+    expect($services)->toContain('cache');
+});
+
+test('it adds custom isolated services', function () {
+    $detector = new ContainerPollutionDetector;
+    $detector->addIsolatedService('custom.service');
+    $detector->addIsolatedService('another.service');
+
+    // Use reflection to verify
+    $reflection = new ReflectionClass($detector);
+    $property = $reflection->getProperty('isolatedServices');
+    $property->setAccessible(true);
+
+    $services = $property->getValue($detector);
+
+    expect($services)->toContain('custom.service');
+    expect($services)->toContain('another.service');
+});
+
+test('it handles snapshots for multiple fibers', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    $fiber1 = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+        Fiber::suspend();
+    });
+
+    $fiber2 = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+        Fiber::suspend();
+    });
+
+    $fiber1->start();
+    $fiber2->start();
+
+    expect(true)->toBeTrue();
+});
+
+test('it can verify container without snapshot when disabled', function () {
+    $detector = new ContainerPollutionDetector;
+    $detector->setEnabled(false);
+    $container = new Container;
+
+    // Should not throw when disabled
+    $detector->verify($container);
+
+    expect(true)->toBeTrue();
+});
+
+test('it captures state of bound services', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    // Bind multiple services
+    $container->singleton('auth', fn () => new class
+    {
+        public string $user = 'test';
+    });
+    $container->singleton('session', fn () => new class
+    {
+        public array $data = ['key' => 'value'];
+    });
+
+    $fiber = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+        $detector->verify($container);
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+
+    expect(true)->toBeTrue();
+});
+
+test('it handles empty container', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    $fiber = new Fiber(function () use ($detector, $container) {
+        $detector->takeSnapshot($container);
+        $detector->verify($container);
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+
+    expect(true)->toBeTrue();
+});
+
+test('it can toggle enabled state', function () {
+    $detector = new ContainerPollutionDetector;
+
+    expect($detector->isEnabled())->toBeTrue();
+
+    $detector->setEnabled(false);
+    expect($detector->isEnabled())->toBeFalse();
+
+    $detector->setEnabled(true);
+    expect($detector->isEnabled())->toBeTrue();
+});
