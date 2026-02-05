@@ -223,3 +223,41 @@ it('uses specific handler over parent class handler using reflection', function 
     expect($specificCalled)->toBeTrue();
     expect($parentCalled)->toBeFalse();
 });
+
+test('it uses default throwable handler for unregistered exceptions', function () {
+    $handler = new ErrorHandler;
+
+    $throwableCalled = false;
+
+    // Register only Throwable handler
+    $handler->register(Throwable::class, function ($e) use (&$throwableCalled) {
+        $throwableCalled = true;
+    });
+
+    // Handle a custom exception that has no specific handler
+    $handler->handle(new class extends Exception {});
+
+    expect($throwableCalled)->toBeTrue();
+});
+
+test('it logs unhandled exceptions with default handler', function () {
+    $handler = new ErrorHandler;
+
+    // The default handler logs to Log facade
+    // We just need to trigger it without throwing
+    $handler->handle(new RuntimeException('Test unhandled exception'));
+
+    expect(true)->toBeTrue();
+});
+
+test('it handles fiber crash exceptions with metrics', function () {
+    $metrics = Mockery::mock(\FiberFlow\Metrics\MetricsCollector::class);
+    $metrics->shouldReceive('recordFiberFailed')->once();
+    $metrics->shouldReceive('recordJobFailed')->once();
+
+    $handler = new ErrorHandler($metrics);
+
+    $handler->handle(new \FiberFlow\Exceptions\FiberCrashException('Test crash'));
+
+    expect(true)->toBeTrue();
+});

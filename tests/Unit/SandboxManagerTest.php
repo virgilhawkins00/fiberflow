@@ -345,3 +345,13 @@ test('it creates default pollution detector when none provided', function () {
 
     expect($manager->getPollutionDetector())->toBeInstanceOf(\FiberFlow\Coroutine\ContainerPollutionDetector::class);
 });
+
+test('it returns base container when called outside fiber context', function () {
+    $baseContainer = new Container;
+    $manager = new SandboxManager($baseContainer);
+
+    // Call createSandbox outside of a Fiber
+    $container = $manager->createSandbox();
+
+    expect($container)->toBe($baseContainer);
+});

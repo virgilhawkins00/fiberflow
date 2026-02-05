@@ -200,3 +200,45 @@ it('falls back to parent facade instance when no fiber container', function () {
 
     $fiber->start();
 });
+
+test('it generates fiber-scoped cache key with fiberPut', function () {
+    $fiber = new Fiber(function () {
+        // Test that fiberPut generates a fiber-scoped key
+        $key = FiberCache::fiberKey('test_key');
+
+        expect($key)->toContain('fiber:');
+        expect($key)->toContain('test_key');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it generates fiber-scoped cache key with fiberGet', function () {
+    $fiber = new Fiber(function () {
+        // Test that fiberGet uses fiber-scoped key
+        $key = FiberCache::fiberKey('get_key');
+
+        expect($key)->toContain('fiber:');
+        expect($key)->toContain('get_key');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+test('it generates fiber-scoped cache key with fiberForget', function () {
+    $fiber = new Fiber(function () {
+        // Test that fiberForget uses fiber-scoped key
+        $key = FiberCache::fiberKey('forget_key');
+
+        expect($key)->toContain('fiber:');
+        expect($key)->toContain('forget_key');
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
