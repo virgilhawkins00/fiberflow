@@ -57,3 +57,47 @@ it('has timeout option', function () {
 
     expect($definition->hasOption('timeout'))->toBeTrue();
 });
+
+it('has gatherWorkerOptions method', function () {
+    $command = new FiberWorkCommand;
+
+    // Use reflection to verify method exists
+    $reflection = new ReflectionClass($command);
+    expect($reflection->hasMethod('gatherWorkerOptions'))->toBeTrue();
+});
+
+it('has displayBanner method', function () {
+    $command = new FiberWorkCommand;
+
+    // Use reflection to verify method exists
+    $reflection = new ReflectionClass($command);
+    expect($reflection->hasMethod('displayBanner'))->toBeTrue();
+});
+
+it('has all required options', function () {
+    $command = new FiberWorkCommand;
+    $definition = $command->getDefinition();
+
+    $requiredOptions = [
+        'queue',
+        'daemon',
+        'once',
+        'stop-when-empty',
+        'delay',
+        'backoff',
+        'max-jobs',
+        'max-time',
+        'force',
+        'memory',
+        'sleep',
+        'rest',
+        'timeout',
+        'tries',
+        'concurrency',
+        'dashboard',
+    ];
+
+    foreach ($requiredOptions as $option) {
+        expect($definition->hasOption($option))->toBeTrue("Option {$option} should exist");
+    }
+});

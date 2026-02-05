@@ -15,7 +15,6 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 use FiberFlow\Http\AsyncHttpClient;
-use FiberFlow\Loop\ConcurrencyManager;
 use Revolt\EventLoop;
 
 class HttpBenchmark
