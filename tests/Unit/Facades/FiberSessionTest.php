@@ -202,3 +202,31 @@ it('returns null for missing session keys without default', function () {
 
     $fiber->start();
 });
+
+it('handles fiberPut outside fiber context', function () {
+    // Should not throw exception when called outside fiber
+    FiberSession::fiberPut('test', 'value');
+
+    expect(true)->toBeTrue();
+});
+
+it('handles fiberForget outside fiber context', function () {
+    // Should not throw exception when called outside fiber
+    FiberSession::fiberForget('test');
+
+    expect(true)->toBeTrue();
+});
+
+it('handles fiberAll outside fiber context', function () {
+    // Should not throw exception when called outside fiber
+    $result = FiberSession::fiberAll();
+
+    expect($result)->toBeArray();
+});
+
+it('handles fiberFlash outside fiber context', function () {
+    // Should not throw exception when called outside fiber
+    FiberSession::fiberFlash('key', 'value');
+
+    expect(true)->toBeTrue();
+});

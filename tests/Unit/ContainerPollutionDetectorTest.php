@@ -446,3 +446,18 @@ test('it handles verification with new services added after snapshot', function 
 
     $fiber->start();
 });
+
+test('it has captureState method', function () {
+    $reflection = new ReflectionClass(ContainerPollutionDetector::class);
+    expect($reflection->hasMethod('captureState'))->toBeTrue();
+});
+
+test('it has hasStateChanged method', function () {
+    $reflection = new ReflectionClass(ContainerPollutionDetector::class);
+    expect($reflection->hasMethod('hasStateChanged'))->toBeTrue();
+});
+
+test('it has verify method', function () {
+    $reflection = new ReflectionClass(ContainerPollutionDetector::class);
+    expect($reflection->hasMethod('verify'))->toBeTrue();
+});

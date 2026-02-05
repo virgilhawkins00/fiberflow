@@ -223,3 +223,27 @@ it('calculates exponential backoff delay correctly', function () {
     expect($delay3)->toBeGreaterThanOrEqual(4000);
     expect($delay3)->toBeLessThanOrEqual(4400); // 4000 + 10% jitter
 });
+
+it('can verify put method signature', function () {
+    $reflection = new ReflectionClass($this->client);
+    $method = $reflection->getMethod('put');
+
+    expect($method->getNumberOfParameters())->toBe(3);
+    expect($method->getNumberOfRequiredParameters())->toBe(1);
+});
+
+it('can verify patch method signature', function () {
+    $reflection = new ReflectionClass($this->client);
+    $method = $reflection->getMethod('patch');
+
+    expect($method->getNumberOfParameters())->toBe(3);
+    expect($method->getNumberOfRequiredParameters())->toBe(1);
+});
+
+it('can verify delete method signature', function () {
+    $reflection = new ReflectionClass($this->client);
+    $method = $reflection->getMethod('delete');
+
+    expect($method->getNumberOfParameters())->toBe(2);
+    expect($method->getNumberOfRequiredParameters())->toBe(1);
+});

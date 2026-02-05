@@ -134,3 +134,81 @@ test('it detects server errors', function () {
     expect($response->status())->toBe(500);
     expect($response->failed())->toBeTrue();
 });
+
+test('it can make a PUT request', function () {
+    $client = new AsyncHttpClient;
+
+    $response = $client->put('https://httpbin.org/put', [
+        'name' => 'FiberFlow',
+        'action' => 'update',
+    ]);
+
+    expect($response->successful())->toBeTrue();
+    $json = $response->json();
+    expect($json)->toHaveKey('json');
+    expect($json['json']['name'])->toBe('FiberFlow');
+});
+
+test('it can make a PATCH request', function () {
+    $client = new AsyncHttpClient;
+
+    $response = $client->patch('https://httpbin.org/patch', [
+        'name' => 'FiberFlow',
+        'action' => 'patch',
+    ]);
+
+    expect($response->successful())->toBeTrue();
+    $json = $response->json();
+    expect($json)->toHaveKey('json');
+    expect($json['json']['name'])->toBe('FiberFlow');
+});
+
+test('it can make a DELETE request', function () {
+    $client = new AsyncHttpClient;
+
+    $response = $client->delete('https://httpbin.org/delete');
+
+    expect($response->successful())->toBeTrue();
+    expect($response->status())->toBe(200);
+});
+
+test('it can get response headers', function () {
+    $client = new AsyncHttpClient;
+
+    $response = $client->get('https://httpbin.org/response-headers?X-Test=FiberFlow');
+
+    expect($response->successful())->toBeTrue();
+    $headers = $response->headers();
+    expect($headers)->toBeArray();
+});
+
+test('it can get single response header', function () {
+    $client = new AsyncHttpClient;
+
+    $response = $client->get('https://httpbin.org/get');
+
+    expect($response->successful())->toBeTrue();
+    $contentType = $response->header('Content-Type');
+    expect($contentType)->toContain('application/json');
+});
+
+test('it can check redirect status code range', function () {
+    $client = new AsyncHttpClient;
+
+    // httpbin follows redirects by default, so we test the method logic
+    $response = $client->get('https://httpbin.org/get');
+
+    // Test that redirect() method works (should be false for 200)
+    expect($response->redirect())->toBeFalse();
+    expect($response->successful())->toBeTrue();
+});
+
+test('it can get underlying response object', function () {
+    $client = new AsyncHttpClient;
+
+    $response = $client->get('https://httpbin.org/get');
+
+    expect($response->successful())->toBeTrue();
+    $ampResponse = $response->getResponse();
+    expect($ampResponse)->toBeInstanceOf(\Amp\Http\Client\Response::class);
+});

@@ -294,3 +294,18 @@ test('it prioritizes specific handlers over generic throwable handler', function
     expect($specificCalled)->toBeTrue();
     expect($genericCalled)->toBeFalse();
 });
+
+test('it uses throwable handler as fallback when no specific handler matches', function () {
+    $handler = new ErrorHandler;
+    $throwableCalled = false;
+
+    // Register only Throwable handler
+    $handler->register(Throwable::class, function ($e) use (&$throwableCalled) {
+        $throwableCalled = true;
+    });
+
+    // Throw an exception that doesn't have a specific handler
+    $handler->handle(new \LogicException('Test exception'));
+
+    expect($throwableCalled)->toBeTrue();
+});

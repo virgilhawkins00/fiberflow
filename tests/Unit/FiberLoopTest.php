@@ -237,3 +237,36 @@ it('has runJobInFiber method', function () {
     $reflection = new ReflectionClass($this->loop);
     expect($reflection->hasMethod('runJobInFiber'))->toBeTrue();
 });
+
+it('has getNextJob method', function () {
+    $reflection = new ReflectionClass($this->loop);
+    expect($reflection->hasMethod('getNextJob'))->toBeTrue();
+});
+
+it('can check shouldQuit property', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $property = $reflection->getProperty('shouldQuit');
+    $property->setAccessible(true);
+
+    expect($property->getValue($this->loop))->toBeFalse();
+});
+
+it('can set shouldQuit to true', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $property = $reflection->getProperty('shouldQuit');
+    $property->setAccessible(true);
+
+    $property->setValue($this->loop, true);
+
+    expect($property->getValue($this->loop))->toBeTrue();
+});
+
+it('has stats property', function () {
+    $reflection = new ReflectionClass($this->loop);
+    $property = $reflection->getProperty('stats');
+    $property->setAccessible(true);
+
+    $stats = $property->getValue($this->loop);
+
+    expect($stats)->toBeArray();
+});

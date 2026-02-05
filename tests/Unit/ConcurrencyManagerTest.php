@@ -253,3 +253,34 @@ test('it waits for suspended fibers to complete', function () {
 
     expect($completed)->toBeTrue();
 });
+
+test('it waits for all fibers with multiple iterations', function () {
+    $manager = new ConcurrencyManager(maxConcurrency: 5);
+    $count = 0;
+
+    // Spawn multiple fibers
+    for ($i = 0; $i < 3; $i++) {
+        $manager->spawn(function () use (&$count) {
+            $count++;
+            Fiber::suspend();
+        });
+    }
+
+    expect($manager->getActiveCount())->toBe(3);
+
+    // Resume all fibers in background
+    $resumeFiber = new Fiber(function () use ($manager) {
+        usleep(30000); // 30ms
+        foreach ($manager->getActiveFibers() as $fiber) {
+            if (!$fiber->isTerminated()) {
+                $fiber->resume();
+            }
+        }
+    });
+    $resumeFiber->start();
+
+    $manager->waitForAll();
+
+    expect($manager->getActiveCount())->toBe(0);
+    expect($count)->toBe(3);
+});

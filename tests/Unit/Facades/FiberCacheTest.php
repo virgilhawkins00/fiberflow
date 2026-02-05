@@ -242,3 +242,18 @@ test('it generates fiber-scoped cache key with fiberForget', function () {
 
     $fiber->start();
 });
+
+it('has fiberRemember method', function () {
+    $reflection = new ReflectionClass(FiberCache::class);
+    expect($reflection->hasMethod('fiberRemember'))->toBeTrue();
+});
+
+it('has fiberForget method', function () {
+    $reflection = new ReflectionClass(FiberCache::class);
+    expect($reflection->hasMethod('fiberForget'))->toBeTrue();
+});
+
+it('has resolveFacadeInstance method', function () {
+    $reflection = new ReflectionClass(FiberCache::class);
+    expect($reflection->hasMethod('resolveFacadeInstance'))->toBeTrue();
+});
