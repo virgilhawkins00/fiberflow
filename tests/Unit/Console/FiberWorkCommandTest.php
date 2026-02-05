@@ -261,8 +261,28 @@ it('can handle execution with dashboard enabled', function () {
         ->once()
         ->andReturnNull();
 
-    // Mock MetricsCollector
+    // Mock MetricsCollector with getAllMetrics
     $metrics = Mockery::mock(MetricsCollector::class);
+    $metrics->shouldReceive('getAllMetrics')
+        ->andReturn([
+            'jobs' => [
+                'processed' => 0,
+                'failed' => 0,
+                'pending' => 0,
+            ],
+            'fibers' => [
+                'active' => 0,
+                'idle' => 0,
+            ],
+            'memory' => [
+                'current' => 0,
+                'peak' => 0,
+            ],
+            'performance' => [
+                'throughput' => 0,
+                'avg_time' => 0,
+            ],
+        ]);
 
     // Create input with dashboard enabled
     $input = new ArrayInput([
