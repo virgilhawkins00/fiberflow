@@ -26,7 +26,6 @@
   },
   "require": {
     "php": "^8.2",
-    "ext-pcntl": "*",
     "amphp/amp": "^3.0",
     "amphp/http-client": "^5.0",
     "amphp/mysql": "^3.0",
@@ -45,6 +44,9 @@
     "phpstan/phpstan": "^1.10",
     "phpunit/phpunit": "^10.0|^11.0",
     "pnixx/amp-rabbitmq": "^2.0"
+  },
+  "suggest": {
+    "ext-pcntl": "Required for signal handling on Unix-like systems (not available on Windows)"
   },
   "autoload": {
     "psr-4": {
