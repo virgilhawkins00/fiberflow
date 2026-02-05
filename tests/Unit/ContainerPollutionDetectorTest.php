@@ -461,3 +461,81 @@ test('it has verify method', function () {
     $reflection = new ReflectionClass(ContainerPollutionDetector::class);
     expect($reflection->hasMethod('verify'))->toBeTrue();
 });
+
+test('it throws exception when container pollution is detected', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    // Create two different objects for the same service
+    $object1 = new class
+    {
+        public function getId()
+        {
+            return 'session-123';
+        }
+    };
+
+    $object2 = new class
+    {
+        public function getId()
+        {
+            return 'session-456';
+        }
+    };
+
+    // Bind the first object
+    $container->singleton('session', fn () => $object1);
+
+    $fiber = new Fiber(function () use ($detector, $container, $object2) {
+        // Take snapshot with object1
+        $detector->takeSnapshot($container);
+
+        // Replace with object2 (different hash)
+        $container->singleton('session', fn () => $object2);
+
+        // This should throw ContainerPollutionException
+        $detector->verify($container);
+
+        Fiber::suspend();
+    });
+
+    expect(fn () => $fiber->start())->toThrow(\FiberFlow\Exceptions\ContainerPollutionException::class);
+});
+
+test('it skips services bound after snapshot during verification', function () {
+    $detector = new ContainerPollutionDetector;
+    $container = new Container;
+
+    // Bind auth service
+    $container->singleton('auth', fn () => new class
+    {
+        public function id()
+        {
+            return 1;
+        }
+    });
+
+    $fiber = new Fiber(function () use ($detector, $container) {
+        // Take snapshot with only auth
+        $detector->takeSnapshot($container);
+
+        // Add session service after snapshot (not in original snapshot)
+        $container->singleton('session', fn () => new class
+        {
+            public function getId()
+            {
+                return 'new-session';
+            }
+        });
+
+        // Verify should not throw because session wasn't in original snapshot
+        // This covers line 115: continue when service not in original snapshot
+        $detector->verify($container);
+
+        expect(true)->toBeTrue();
+
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
