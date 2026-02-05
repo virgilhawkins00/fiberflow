@@ -147,3 +147,43 @@ it('can create client with all parameters set to maximum values', function () {
 
     expect($client)->toBeInstanceOf(AsyncHttpClient::class);
 });
+
+it('has put method available', function () {
+    expect(method_exists($this->client, 'put'))->toBeTrue();
+});
+
+it('has patch method available', function () {
+    expect(method_exists($this->client, 'patch'))->toBeTrue();
+});
+
+it('has delete method available', function () {
+    expect(method_exists($this->client, 'delete'))->toBeTrue();
+});
+
+it('can call put method with url and data', function () {
+    // We can't actually make HTTP requests in unit tests,
+    // but we can verify the method exists and accepts the right parameters
+    $reflection = new ReflectionMethod($this->client, 'put');
+
+    expect($reflection->getNumberOfParameters())->toBe(3);
+    expect($reflection->getParameters()[0]->getName())->toBe('url');
+    expect($reflection->getParameters()[1]->getName())->toBe('data');
+    expect($reflection->getParameters()[2]->getName())->toBe('headers');
+});
+
+it('can call patch method with url and data', function () {
+    $reflection = new ReflectionMethod($this->client, 'patch');
+
+    expect($reflection->getNumberOfParameters())->toBe(3);
+    expect($reflection->getParameters()[0]->getName())->toBe('url');
+    expect($reflection->getParameters()[1]->getName())->toBe('data');
+    expect($reflection->getParameters()[2]->getName())->toBe('headers');
+});
+
+it('can call delete method with url', function () {
+    $reflection = new ReflectionMethod($this->client, 'delete');
+
+    expect($reflection->getNumberOfParameters())->toBe(2);
+    expect($reflection->getParameters()[0]->getName())->toBe('url');
+    expect($reflection->getParameters()[1]->getName())->toBe('headers');
+});

@@ -146,3 +146,59 @@ it('can transition from paused to stopping', function () {
     expect($this->controller->isStopping())->toBeTrue();
     expect($this->controller->isPaused())->toBeFalse();
 });
+
+it('displays correct state with getStateDisplay', function () {
+    expect($this->controller->getStateDisplay())->toBe('🟢 RUNNING');
+
+    $this->controller->pause();
+    expect($this->controller->getStateDisplay())->toBe('🟡 PAUSED');
+
+    $this->controller->stop();
+    expect($this->controller->getStateDisplay())->toBe('🟠 STOPPING');
+
+    $this->controller->forceStop();
+    expect($this->controller->getStateDisplay())->toBe('🔴 STOPPED');
+});
+
+it('handles keyboard input for pause', function () {
+    $this->controller->handleInput('p');
+
+    expect($this->controller->isPaused())->toBeTrue();
+});
+
+it('handles keyboard input for resume', function () {
+    $this->controller->pause();
+    $this->controller->handleInput('r');
+
+    expect($this->controller->isRunning())->toBeTrue();
+});
+
+it('handles keyboard input for stop', function () {
+    $this->controller->handleInput('s');
+
+    expect($this->controller->isStopping())->toBeTrue();
+});
+
+it('handles keyboard input for force stop', function () {
+    $this->controller->handleInput('q');
+
+    expect($this->controller->isStopped())->toBeTrue();
+});
+
+it('handles unknown keyboard input', function () {
+    $initialState = $this->controller->getState();
+
+    $this->controller->handleInput('x'); // Unknown command
+
+    expect($this->controller->getState())->toBe($initialState);
+});
+
+it('provides help text', function () {
+    $helpText = $this->controller->getHelpText();
+
+    expect($helpText)->toBeString();
+    expect($helpText)->toContain('P');
+    expect($helpText)->toContain('R');
+    expect($helpText)->toContain('S');
+    expect($helpText)->toContain('Q');
+});
