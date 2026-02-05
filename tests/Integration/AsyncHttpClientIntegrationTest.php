@@ -114,7 +114,7 @@ test('it retries on network errors', function () {
         retryAttempts: 3,
         retryDelay: 100
     );
-    
+
     try {
         // Invalid host - will cause network error
         $client->get('http://invalid-host-that-does-not-exist.local/test');
@@ -124,4 +124,5 @@ test('it retries on network errors', function () {
         expect(true)->toBeTrue();
     }
 })->group('integration');
+
 

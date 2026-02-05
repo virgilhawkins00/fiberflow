@@ -22,6 +22,11 @@ class FiberLoop
     protected bool $shouldQuit = false;
 
     /**
+     * Indicates if the worker is paused.
+     */
+    protected bool $paused = false;
+
+    /**
      * Statistics for the current run.
      *
      * @var array<string, int>
@@ -73,10 +78,56 @@ class FiberLoop
     }
 
     /**
+     * Get current statistics.
+     *
+     * @return array<string, int>
+     */
+    public function getStats(): array
+    {
+        return $this->stats;
+    }
+
+    /**
+     * Pause the worker.
+     */
+    public function pause(): void
+    {
+        $this->paused = true;
+    }
+
+    /**
+     * Resume the worker.
+     */
+    public function resume(): void
+    {
+        $this->paused = false;
+    }
+
+    /**
+     * Check if the worker is paused.
+     */
+    public function isPaused(): bool
+    {
+        return $this->paused;
+    }
+
+    /**
+     * Stop the worker.
+     */
+    public function stop(): void
+    {
+        $this->shouldQuit = true;
+    }
+
+    /**
      * Process the next job from the queue.
      */
     protected function processNextJob(string $connection, string $queue, WorkerOptions $options): void
     {
+        if ($this->paused) {
+            return;
+        }
+
         if ($this->concurrency->isFull()) {
             return;
         }

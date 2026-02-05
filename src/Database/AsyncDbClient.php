@@ -82,9 +82,11 @@ class AsyncDbClient
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
-        $this->query($sql, $bindings);
+        // Execute INSERT and get last insert ID
+        $statement = $this->pool->prepare($sql);
+        $result = $statement->execute($bindings);
 
-        return $this->pool->getLastInsertId();
+        return $result->getLastInsertId();
     }
 
     /**
@@ -98,9 +100,11 @@ class AsyncDbClient
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
-        $result = $this->query($sql, $bindings);
+        // Execute UPDATE and get affected rows
+        $statement = $this->pool->prepare($sql);
+        $result = $statement->execute($bindings);
 
-        return count($result);
+        return $result->getRowCount();
     }
 
     /**
@@ -114,9 +118,11 @@ class AsyncDbClient
             throw new \RuntimeException('AsyncDb is not enabled. Set FIBERFLOW_DB_ENABLED=true');
         }
 
-        $result = $this->query($sql, $bindings);
+        // Execute DELETE and get affected rows
+        $statement = $this->pool->prepare($sql);
+        $result = $statement->execute($bindings);
 
-        return count($result);
+        return $result->getRowCount();
     }
 
     /**
