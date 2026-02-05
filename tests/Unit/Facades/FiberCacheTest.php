@@ -275,3 +275,71 @@ it('has resolveFacadeInstance method', function () {
     $reflection = new ReflectionClass(FiberCache::class);
     expect($reflection->hasMethod('resolveFacadeInstance'))->toBeTrue();
 });
+
+it('can use fiberPut to store values', function () {
+    // Mock the sandbox manager
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+    $sandboxManager->shouldReceive('getCurrentContainer')->andReturn(app());
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $fiber = new Fiber(function () {
+        $result = FiberCache::fiberPut('test_key', 'test_value');
+        expect($result)->toBeTrue();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+it('can use fiberGet to retrieve values', function () {
+    // Mock the sandbox manager
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+    $sandboxManager->shouldReceive('getCurrentContainer')->andReturn(app());
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $fiber = new Fiber(function () {
+        FiberCache::fiberPut('test_key', 'test_value');
+        $value = FiberCache::fiberGet('test_key');
+        expect($value)->toBe('test_value');
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+it('can use fiberRemember to cache values', function () {
+    // Mock the sandbox manager
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+    $sandboxManager->shouldReceive('getCurrentContainer')->andReturn(app());
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $fiber = new Fiber(function () {
+        $called = false;
+        $value = FiberCache::fiberRemember('remember_key', 60, function () use (&$called) {
+            $called = true;
+            return 'computed_value';
+        });
+
+        expect($value)->toBe('computed_value');
+        expect($called)->toBeTrue();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
+
+it('can use fiberForget to remove values', function () {
+    // Mock the sandbox manager
+    $sandboxManager = Mockery::mock(\FiberFlow\Coroutine\SandboxManager::class);
+    $sandboxManager->shouldReceive('getCurrentContainer')->andReturn(app());
+    app()->instance('fiberflow.sandbox', $sandboxManager);
+
+    $fiber = new Fiber(function () {
+        FiberCache::fiberPut('forget_key', 'value');
+        $result = FiberCache::fiberForget('forget_key');
+        expect($result)->toBeTrue();
+        Fiber::suspend();
+    });
+
+    $fiber->start();
+});
