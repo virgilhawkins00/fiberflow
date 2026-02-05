@@ -89,3 +89,57 @@ test('it gets refill rate', function () {
 
     expect($limiter->getRefillRate())->toBe(5.5);
 });
+
+test('it waits until tokens are available', function () {
+    $limiter = new RateLimiter(maxTokens: 5, refillRate: 10.0);
+
+    // Consume all tokens
+    $limiter->attempt(5);
+
+    // This should wait and then succeed
+    $startTime = microtime(true);
+    $limiter->wait(1);
+    $elapsed = microtime(true) - $startTime;
+
+    // Should have waited approximately 0.1 seconds (1 token / 10 tokens per second)
+    expect($elapsed)->toBeGreaterThan(0.05);
+    expect($limiter->getTokens())->toBeLessThan(5);
+});
+
+test('it waits for multiple tokens', function () {
+    $limiter = new RateLimiter(maxTokens: 10, refillRate: 10.0);
+
+    // Consume all tokens
+    $limiter->attempt(10);
+
+    // Wait for 3 tokens
+    $startTime = microtime(true);
+    $limiter->wait(3);
+    $elapsed = microtime(true) - $startTime;
+
+    // Should have waited approximately 0.3 seconds (3 tokens / 10 tokens per second)
+    expect($elapsed)->toBeGreaterThan(0.2);
+});
+
+test('it does not wait when tokens already available', function () {
+    $limiter = new RateLimiter(maxTokens: 10, refillRate: 1.0);
+
+    $startTime = microtime(true);
+    $limiter->wait(5);
+    $elapsed = microtime(true) - $startTime;
+
+    // Should complete almost immediately
+    expect($elapsed)->toBeLessThan(0.01);
+});
+
+test('it handles wait with single token', function () {
+    $limiter = new RateLimiter(maxTokens: 1, refillRate: 10.0);
+
+    $limiter->attempt(1);
+
+    $startTime = microtime(true);
+    $limiter->wait(1);
+    $elapsed = microtime(true) - $startTime;
+
+    expect($elapsed)->toBeGreaterThan(0.05);
+});
